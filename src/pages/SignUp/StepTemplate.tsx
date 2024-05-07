@@ -12,10 +12,11 @@ import InputsWrapper from "./InputsWrapper";
 import React, { ReactNode } from "react";
 import { StepObjectInterface } from "./Steps/StepObjectInterface";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { InputType } from "./Steps/InputType";
 
 interface StepTemplatePropsInterface {
     navigation: NativeStackNavigationProp<any, 'SignUp'>,
-    dataChangeHandler: (value: string, index: number) => void;
+    inputChangeHandler: (value: string, index: number) => void;
     currentStepNumber: number;
     title: string;
     description: string;
@@ -23,9 +24,12 @@ interface StepTemplatePropsInterface {
     children: ReactNode;
     step?: StepObjectInterface;
     currentErrors: Record<string, string[]>;
+    inputs?: InputType[];
+    notFilledMessage: string;
 }
 
 export default function StepTemplate(props: StepTemplatePropsInterface){
+    console.log('renderizou');
     return (
         <KeyboardAvoidingView
             style={{flex: 1}}
@@ -68,16 +72,15 @@ export default function StepTemplate(props: StepTemplatePropsInterface){
                         }}>{props.currentStepNumber}</Text>
                         <Text style={formStyles.title}>{props.title}</Text>
                         <Text style={formStyles.description}>{props.description}</Text>
-                        {props.step && <InputsWrapper step={props.step} dataChangeHandler={props.dataChangeHandler}
+                        {props.inputs && <InputsWrapper inputs={props.inputs} inputChangeHandler={props.inputChangeHandler}
                             currentErrors={props.currentErrors}
                         />}
                         
-                        {props.errorMessage !== undefined && props.step &&
+                        {props.notFilledMessage &&
                             <Text style={{color: 'red', textAlign: 'center', fontSize: 14}}>
-                                {props.step.notFilledMessage}
+                                {props.notFilledMessage}
                             </Text>
                         }
-                        
                         {props.children}
 
                         <Text style={{textAlign: 'center', fontSize: 16, marginTop: 24}}>Já possui uma conta? <Text style={formStyles.ancor} onPress={() => props.navigation.navigate('Login')}>Acesse agora!</Text></Text>

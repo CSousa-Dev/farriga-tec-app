@@ -1,7 +1,7 @@
 import { api } from "../api";
 import { ResponseFieldByFieldValidationType } from "./ResponseFieldByFieldValidationType";
 
-type BasicUserDataValidation = {
+export interface BasicUserDataValidation extends Record<string, string> {
     firstName: string
     lastName: string
     birthDate: string,

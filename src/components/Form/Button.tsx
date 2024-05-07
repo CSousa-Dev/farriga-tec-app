@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { ReactElement } from "react";
-import { Text, StyleSheet, TouchableOpacity} from "react-native";
+import { Text, StyleSheet, TouchableOpacity, ActivityIndicator} from "react-native";
 
 
 export default function Button(props: ButtonProps) {    
@@ -15,6 +15,12 @@ export default function Button(props: ButtonProps) {
     let selectedStyle = buttonStyle[type];
         
     let StyledText = (): ReactElement => {
+        if(props.loading && type == 'outlined') 
+            return <ActivityIndicator size="large" color="#0f9e20" />
+
+        if(props.loading && type == 'filled')
+             return <ActivityIndicator size="large" color="#CCCCCC" />
+
         return <Text style={selectedStyle.text}>{props.text}</Text>
     };
 
@@ -24,9 +30,9 @@ export default function Button(props: ButtonProps) {
             <LinearGradient
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
-            style={{borderRadius: 4}}
+            style={{borderRadius: 4, minHeight: 60, justifyContent: 'center'}}
             colors={colors}
-            >    
+            >  
                 <StyledText/>
             </LinearGradient>
         )
@@ -56,6 +62,7 @@ interface ButtonProps {
     containerStyle?: StyleSheet.NamedStyles<object>
     size?: 'sm' | 'md' | 'lg',
     disabled?: boolean
+    loading?: boolean
 }
 
 

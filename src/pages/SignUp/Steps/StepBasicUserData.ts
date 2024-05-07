@@ -1,5 +1,5 @@
 import { ResponseFieldByFieldValidationType } from "../../../services/Validation/ResponseFieldByFieldValidationType";
-import { validateBasicUserData } from "../../../services/Validation/validateBasicUserData";
+import { BasicUserDataValidation, validateBasicUserData } from "../../../services/Validation/validateBasicUserData";
 import AbstractStep from "./AbstractStep";
 import { InputType } from "./InputType";
 import { StepObjectInterface } from "./StepObjectInterface";
@@ -29,7 +29,7 @@ export default class StepBasicUserData extends AbstractStep implements StepObjec
             label: 'CPF',
             placeholder: 'Informe o número do seu CPF.',
             format: '###.###.###-##',
-            type: 'numeric',
+            keyboardType: 'numeric',
             required: true
         },
         {
@@ -47,30 +47,22 @@ export default class StepBasicUserData extends AbstractStep implements StepObjec
         }
     ];
 
-    async validateStep(): Promise<ResponseFieldByFieldValidationType | null> {
-        console.log({
+    getCurrentValidationSet(): BasicUserDataValidation {
+        return {
             firstName: this.inputList[0].value || '',
             lastName: this.inputList[1].value || '',
             documentType: 'CPF',
             documentNumber: this.inputList[2].value || '',
             birthDate: this.inputList[3].value || '',
-            email: this.inputList[4].value || ''})
-        
-        
-        try {
-            let response = await validateBasicUserData({
-                firstName: this.inputList[0].value || '',
-                lastName: this.inputList[1].value || '',
-                documentType: 'CPF',
-                documentNumber: this.inputList[2].value || '',
-                birthDate: this.inputList[3].value || '',
-                email: this.inputList[4].value || ''
-            })
-
-            return response;
-        } catch (error) {
-            console.error(error);
-            return null;
+            email: this.inputList[4].value || ''
         }
-    } 
+    }
+
+    validationIsRequired(): boolean {
+        return true;
+    }
+
+    validationService(): Promise<ResponseFieldByFieldValidationType | null> {
+        return validateBasicUserData(this.getCurrentValidationSet());
+    }
 }

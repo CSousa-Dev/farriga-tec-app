@@ -1,4 +1,5 @@
 import { ResponseFieldByFieldValidationType } from "../../../services/Validation/ResponseFieldByFieldValidationType";
+import { AddressDataValidation, validateAddress } from "../../../services/Validation/validateAddress";
 import { validateBasicUserData } from "../../../services/Validation/validateBasicUserData";
 import AbstractStep from "./AbstractStep";
 import { InputType } from "./InputType";
@@ -7,7 +8,7 @@ import { StepObjectInterface } from "./StepObjectInterface";
 export default class StepAddress extends AbstractStep implements StepObjectInterface
 {
     public readonly title: string = 'Dados básicos.';
-    public readonly description: string = 'Para iniciarmos precisamos de algumas informações básicas.';
+    public readonly description: string = 'Agora vamos cadastrar seu endereço.';
     public readonly skip: boolean = false;
     public readonly notFilledMessage: string = 'Caso decida preencher o endereço, é necessário que preencha todos os campos exceto complemento e referência que são opcionais.';
     public readonly password: boolean = false;
@@ -18,13 +19,14 @@ export default class StepAddress extends AbstractStep implements StepObjectInter
             placeholder: 'Ex: xxxxx-xxx',
             format: '#####-###',
             requiredIfNotEmpty: ['zipCode','street', 'number', 'neighborhood', 'city', 'state', 'country', 'complement', 'reference'],
-            type: 'numeric'
+            keyboardType: 'numeric'
         },
         {
             field: 'street',
             label: 'Rua',
             placeholder: 'Ex: Rua das Flores',
             requiredIfNotEmpty: ['zipCode','street', 'number', 'neighborhood', 'city', 'state', 'country', 'complement', 'reference'],
+            type: 'password'
         },
         {
             field: 'number',
@@ -68,21 +70,31 @@ export default class StepAddress extends AbstractStep implements StepObjectInter
         }
     ];
 
-    async validateStep(): Promise<ResponseFieldByFieldValidationType | null> {
-        try {
-            let response = await validateBasicUserData({
-                firstName: this.inputList[0].value || '',
-                lastName: this.inputList[1].value || '',
-                documentType: 'CPF',
-                documentNumber: this.inputList[2].value || '',
-                birthDate: this.inputList[3].value || '',
-                email: this.inputList[4].value || ''
-            })
+    validationIsRequired(): boolean {
+        return this.someFieldIsFilled();
+    }
 
-            return response;
-        } catch (error) {
-            console.error(error);
-            return null;
+    someFieldIsFilled(): boolean {
+        return this.inputList.some((input) => {
+            return !this.inputIsEmpty(input);
+        });
+    }
+
+    validationService(): Promise<ResponseFieldByFieldValidationType | null> {
+        return validateAddress(this.getCurrentValidationSet());
+    }
+
+    getCurrentValidationSet(): AddressDataValidation {
+        return {
+            zipCode: this.inputList[0].value || '',
+            street: this.inputList[1].value || '',
+            number: this.inputList[2].value || '',
+            neighborhood: this.inputList[3].value || '',
+            city: this.inputList[4].value || '',
+            state: this.inputList[5].value || '',
+            country: this.inputList[6].value || '',
+            complement: this.inputList[7].value || '',
+            reference: this.inputList[8].value || ''
         }
-    } 
+    }
 }

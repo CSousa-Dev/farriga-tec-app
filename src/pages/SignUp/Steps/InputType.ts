@@ -6,7 +6,8 @@ export type InputType = {
     value?: string
     erros?: string[]
     format?: string
-    type?: 'text' | 'numeric' | 'date'
+    type?: 'text' | 'date' | 'password'
+    keyboardType?: 'numeric' | 'default'
     required?: boolean
     requiredIfNotEmpty?: string[]
 }

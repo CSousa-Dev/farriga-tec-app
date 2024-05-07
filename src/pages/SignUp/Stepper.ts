@@ -44,11 +44,6 @@ export default class Stepper
         return this.currentStepNumber;
     }
 
-    // public currentStepNumbers(): number
-    // {
-    //     return this.step;
-    // }
-
     public hasPreviousStep(): boolean
     {
         return this.steps[this.currentStepNumber - 1] != undefined;
@@ -61,7 +56,7 @@ export default class Stepper
 
     public isReadyForNextStep(): boolean
     {
-        return this.currentStep().allRequiredInputsIsFilled();
+        return this.currentStep().validForNextStep(); 
     }
 
     setValue(value: string, index: number): void

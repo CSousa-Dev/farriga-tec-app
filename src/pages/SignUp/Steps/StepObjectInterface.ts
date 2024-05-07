@@ -10,4 +10,7 @@ export interface StepObjectInterface {
     inputs: () => InputType[]
     allRequiredInputsIsFilled: () => boolean
     validateStep: () => Promise<ResponseFieldByFieldValidationType | null>
+    validForNextStep: () => boolean
+    validationIsRequired: () => boolean
+    returnAssocArrayInputs: () => Record<string, InputType>
 }

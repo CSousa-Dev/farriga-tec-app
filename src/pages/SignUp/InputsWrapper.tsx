@@ -1,18 +1,19 @@
 import React from 'react';
 import { View, ScrollView, Dimensions, Text } from 'react-native';
-import Input from '../../components/Form/Input';
 import { StepObjectInterface } from './Steps/StepObjectInterface';
+import Input from '../../components/Form/Input/Input';
+import { InputType } from './Steps/InputType';
 
 interface InputWrapperProps {
-    step: StepObjectInterface;
-    dataChangeHandler: (value: string, index: number) => void;
+    inputChangeHandler: (value: string, index: number) => void;
     currentErrors: Record<string, string[]>
+    inputs: InputType[]
 }
 
 const InputsWrapper = (props: InputWrapperProps) => {
     const maxHeight = Dimensions.get('window').height * 0.4;
     const handleChangeInput = (text: string, index: number) => {
-        props.dataChangeHandler(text, index);
+        props.inputChangeHandler(text, index);
     }
 
     return (
@@ -21,14 +22,14 @@ const InputsWrapper = (props: InputWrapperProps) => {
                 style={{ maxHeight, overflow: 'hidden' }}
                 showsVerticalScrollIndicator={true}
             >
-                {props.step.inputs().map((input, index) => (
+                {props.inputs.map((input, index) => (
                     <Input 
-                        password={input.password}
-                        initialValue={input.value}
+                        value={input.value}
+                        keyboardType={input.keyboardType}
                         format={input.format}
                         key={index + input.field}
                         label={input.label} 
-                        type={input.type}
+                        type={input.type || 'text'}
                         placeholder={input.placeholder} 
                         onChange={(text) => handleChangeInput(text, index)}
                         containerStyle={{

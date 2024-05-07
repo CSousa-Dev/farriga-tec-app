@@ -1,128 +1,106 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { 
     View, 
     Text, 
-    KeyboardAvoidingView, 
-    ImageBackground, 
-    Platform, 
-    ScrollView, 
-    Image, 
-    StyleSheet, 
+    StyleSheet
 } from "react-native";
 import Button from "../../components/Form/Button";
-import Stepper from "./Stepper";
-import { StepObjectInterface } from "./Steps/StepObjectInterface";
-import StepTemplate from "./StepTemplate";
-import StepBasicUserData from "./Steps/StepBasicUserData";
-import StepAddress from "./Steps/StepAddress";
+import ToastManager, { Toast } from "toastify-react-native";
+import StepTemplate from "./Steps/StepTemplate";
+import BasicDataStep from "./Steps/BasicDataSetp";
+import AddressStep from "./Steps/AddressStep";
+import PasswordStep from "./Steps/PasswordStep";
+import { validateBasicUserData } from "../../services/Validation/validateBasicUserData";
 
 export default function SignUp({navigation} : {navigation: NativeStackNavigationProp<any, 'SignUp'> }){
-    const [stepper, setStepper] = useState<Stepper>();
-    const [step, setStep] = useState<StepObjectInterface>();
-    const [isReadyStep, setIsReadyStep] = useState<boolean>(false);
-    const [currentErrors, setCurrentErrors] = useState<Record<string, string[]>>();
-
-    useEffect(() => {
-        const newStepper = new Stepper(
-            new StepBasicUserData(),
-            new StepAddress()
-        );
-        setStepper(newStepper);
-        setStep(newStepper.currentStep());
-        setIsReadyStep(newStepper?.isReadyForNextStep() || false)
-    },[])
-
-    async function nextStep(){
-        try{
-            let response = await stepper?.validateCurrentStep();
-            if(response){
-                setCurrentErrors(response.errors);
-                return;
-            }
-        } catch(e){
-            console.log('erro ao validar', e);
+    const [isReadyStep, setIsReadyStep]     = useState<boolean>(false);
+    const [isLoading, setIsLoading]         = useState<boolean>(false);
+    const [stepsConfig, setStepsConfig]     = useState([
+        {
+            title: 'Dados Pessoais',
+            description: 'Vamos começar com seus dados pessoais',
+            component: <BasicDataStep onChange={(basicData, isReady) => onChangeHandler(basicData, isReady)}/>,
+            validationService: validateBasicUserData,
+            validationErrors: []
+        },
+        {
+            title: 'Endereço',
+            description: 'Agora é importante sabermos seu endereço',
+            component: <AddressStep onChange={(address, isReady) => onChangeHandler(address, isReady)}/>
+        },
+        {
+            title: 'Senha',
+            description: 'Precisamos que você crie uma senha segura',
+            component: <PasswordStep onChange={(password, isReady) => onChangeHandler(password, isReady)}/>
         }
+    ]);
 
+    const [currentStep, setCurrentStep] = useState<number>(0);
 
-        // stepper?.nextStep();
-        // setIsReadyStep(stepper?.isReadyForNextStep() || false)
-        // setStep(stepper?.currentStep());
+    const nextStep = () => {
+        if(currentStep === stepsConfig.length - 1) return;
+        setCurrentStep(currentStep + 1);
     }
 
-    function previousStep(){
-        stepper?.previousStep();
-        setIsReadyStep(stepper?.isReadyForNextStep() || false)
-        setStep(stepper?.currentStep());
+    const previousStep = () => {
+        if(currentStep === 0) navigation.navigate('Home');
+        setCurrentStep(currentStep - 1);
+    }
+
+    const onChangeHandler = (data: Object , isReady: boolean) => 
+    {
+        console.log(data, isReady)
+        setIsReadyStep(isReady);
     }
 
     let NavButtons = () => {
         return(
             <View>
-                {stepper?.hasNextStep() ? (
+                { currentStep <= stepsConfig.length - 1  && 
                     <Button
-                        text='Próximo' 
+                        text={currentStep === stepsConfig.length -1 && 'Finalizar' || 'Próximo'} 
+                        loading={isLoading}
                         onPress={() => nextStep()}
                         containerStyle={{
-                            marginTop: 16,
-                            marginVertical: 8,
+                            marginVertical: 16,
                             width: '85%',
                             alignSelf: 'center'
                         }}
-                        // disabled={!isReadyStep}
-                    />
-                ): (
-                    <Button
-                        text='Finalizar' 
-                        onPress={() => nextStep()}
-                        containerStyle={{
-                            marginTop: 16,
-                            marginVertical: 8,
-                            width: '85%',
-                            alignSelf: 'center'
-                        }}    
                         disabled={!isReadyStep}
-                    />  
-                )}
-                {stepper?.hasPreviousStep() && (
+                />}
+
+                { currentStep >= 0 && 
                     <Button
-                        text='Anterior' 
+                        text={currentStep === 0 ? 'Cancelar' : 'Anterior'}
                         type='outlined'
                         onPress={() => previousStep()}
                         containerStyle={{
                             width: '85%',
                             alignSelf: 'center'
-                        }}    
+                        }} 
+                        disabled={isLoading}   
                     />
-                )}
+                }
             </View>
         )
     }   
 
-    // const handleChangeStep = () => {
-    //     setIsReadyStep(stepper?.requiredFieldsIsFilled() || false)
-    // }
-
-    const handleDataChange = (value:string , index: number) => {
-        stepper?.setValue(value, index);
-        setIsReadyStep(stepper?.isReadyForNextStep() || false)
-    }
-
     return (
         <StepTemplate
-            dataChangeHandler={handleDataChange}
-            description={step?.description || ''}
-            currentStepNumber={stepper?.getCurrentStepNumber() || 0}
-            title={step?.title || ''}
-            step={step}
-            navigation={navigation}
-            currentErrors={currentErrors? currentErrors : {}}
+            description={stepsConfig[currentStep].description}
+            currentStepNumber={currentStep + 1}
+            title={stepsConfig[currentStep].title}
         >
-            {!isReadyStep &&
-                <Text style={{textAlign: 'center', color: '#ca0000', marginVertical: 12}} >{step?.notFilledMessage}</Text>
-            } 
-
+            <ToastManager
+                height={'auto'}
+                textStyle={{fontSize: 16, padding: 8, textAlign: 'center'}}
+                style={{paddingRight: 32, width: 'auto', marginHorizontal: '5%'}}
+                positionValue={100}
+            />
+                {stepsConfig[currentStep].component}
             <NavButtons/>
+            <Text style={{textAlign: 'center', fontSize: 16, marginTop: 24}}>Já possui uma conta? <Text style={formStyles.ancor} onPress={() => navigation.navigate('Login')}>Acesse agora!</Text></Text>
         </StepTemplate> 
     )
 }

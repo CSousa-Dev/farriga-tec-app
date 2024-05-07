@@ -6,5 +6,6 @@ export interface StepInterface {
     inputs: InputType[]
     skip?: boolean,
     password?: boolean
+    validForNextStep(): boolean
     notFilledMessage?: string
 }

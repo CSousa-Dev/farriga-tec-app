@@ -10,8 +10,8 @@ import {
     ScrollView
 } from "react-native";
 import Button from "../components/Form/Button";
-import Input from "../components/Form/Input";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Input from "../components/Form/Input/Input";
 
 
 export default function Login({navigation} : {navigation: NativeStackNavigationProp<any, 'Login'> }){
@@ -69,7 +69,7 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                         />
                         <Input 
                             label="Senha" 
-                            password 
+                            type="password"
                             placeholder="Informe sua senha aqui..."
                             containerStyle={{
                                 width: '85%',
