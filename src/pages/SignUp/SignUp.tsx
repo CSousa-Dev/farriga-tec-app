@@ -1,7 +1,6 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { 
-    View, 
     Text, 
     StyleSheet
 } from "react-native";
@@ -18,6 +17,7 @@ import NewPasswordInterface from "../../Interfaces/Domain/Account/NewPasswordInt
 import NavButtons from "./Steps/NavButtons";
 import { AddressDataValidation } from "../../services/Validation/AddressValidation";
 import { PasswordValidation } from "../../services/Validation/PasswordValidation";
+import registerAccount, { RegisterAccountRequestInterface } from "../../services/Account/RegisterAccount";
 
 interface Step {
     title: string,
@@ -145,7 +145,7 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
 
             if(!hasErrors){
                 clearErrorsForCurrentStep();
-                setIsLoading(false);
+                register();
                 Toast.success('Sua conta foi cadastrada com sucesso, seja bem vindo ao FarrigaTec.', 'bottom');
             }
         } catch (error) {
@@ -174,6 +174,49 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
         setIsReadyStep(isReady);
         setStepsConfig({...stepsConfig, [getCurrentStepKey()]: {...Object.values(stepsConfig)[currentStep], data}});
     }
+
+    const register = async () => {
+        let requestBody : RegisterAccountRequestInterface = {
+            firstName: stepsConfig.basicData.data?.firstName || '',
+            lastName: stepsConfig.basicData.data?.lastName || '',
+            email: stepsConfig.basicData.data?.email || '',
+            birthDate: stepsConfig.basicData.data?.birthDate || '',
+            plainPassword: stepsConfig.password.data?.password || '',
+            document: {
+                number: stepsConfig.basicData.data?.documentNumber || '',
+                type: stepsConfig.basicData.data?.documentType || ''
+            }
+        }
+
+        const hasAddressData = Object.values(stepsConfig.address.data).some(value => value !== '');
+
+        if(hasAddressData){
+            requestBody.address = {
+                zipCode: stepsConfig.address.data?.zipCode || '',
+                street: stepsConfig.address.data?.street || '',
+                number: stepsConfig.address.data?.number || '',
+                neighborhood: stepsConfig.address.data?.neighborhood || '',
+                city: stepsConfig.address.data?.city || '',
+                state: stepsConfig.address.data?.state || '',
+                country: stepsConfig.address.data?.country || '',
+                complement: stepsConfig.address.data?.complement || '',
+                reference: stepsConfig.address.data?.reference || ''
+            }
+        }
+
+        try {
+            let response = await registerAccount(requestBody);
+            console.log(response)
+            return response;
+        } catch (error) {
+            if((error as any).response.status == 422)
+                Toast.error(`Ops! ${(error as any).response.data.message}`, 'bottom');
+            
+            console.log(error)
+        }     
+    }
+
+
 
     return (
         <StepTemplate
@@ -217,7 +260,7 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
             <NavButtons
                 preventDefault
                 numberOfSteps={Object.keys(stepsConfig).length}
-                isLoading={isLoading}
+                isLoading={false}
                 isReadyStep={isReadyStep}
                 currentStep={currentStep}
                 onNext={() => handleNext()}
