@@ -64,6 +64,8 @@ export default function NavButtons ({
     }
 
     const onNextStep = () => {
+        if(isLoading) return;
+
         if(!preventDefault && hasNextStep()) {
             props.onChange && props.onChange(defaultStep + 1);
             props.onNext && props.onNext(defaultStep + 1);
