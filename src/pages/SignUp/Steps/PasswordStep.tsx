@@ -1,36 +1,37 @@
 import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import NewPasswordInterface from "../../../Interfaces/Domain/Account/NewPasswordInterface";
 
 interface PasswordProps {
-    onChange: (data: Password, isReady: boolean) => void;
+    onChange: (data: NewPasswordInterface, isReady: boolean) => void;
     validationErrors?: Record<string, string[]>;
-}
-
-interface Password {
-    password: string;
-    confirmationPassword: string;
+    initialValues ?: NewPasswordInterface;
 }
 
 export default function PasswordStep(props: PasswordProps)
 {
     const maxHeight = Dimensions.get('window').height * 0.4;
-    const [password, setPassword] = useState<Password>({
-        password: '',
-        confirmationPassword: ''
+    const [password, setPassword] = useState<NewPasswordInterface>({
+        password: props.initialValues?.password || '',
+        passwordConfirmation: props.initialValues?.passwordConfirmation || ''
     });
     const [isStepReady, setIsStepReady] = useState<boolean>(false);
 
-    const onChangeHandler = async (password: Password) => {
-        const isReady = confirmationPasswordIsEqual();
+    useEffect(() => {
+        onChangeHandler(password);
+    },[])
+
+    const onChangeHandler = async (password: NewPasswordInterface) => {
+        const isReady = confirmationPasswordIsEqual(password);
         setIsStepReady(isReady);
         setPassword(password);
         props.onChange(password, isReady);
     }
 
-    const confirmationPasswordIsEqual = () => {
-        if(password.password.length === 0 || password.confirmationPassword.length === 0) return false;
-        return password.password === password.confirmationPassword;
+    const confirmationPasswordIsEqual = (password: NewPasswordInterface) => {
+        if(password.password.length === 0 || password.passwordConfirmation.length === 0) return false;
+        return password.password === password.passwordConfirmation;
     }
 
     return (
@@ -52,11 +53,11 @@ export default function PasswordStep(props: PasswordProps)
                 }}
             />
             <Input 
-                value={password.confirmationPassword}
+                value={password.passwordConfirmation}
                 label="Confirme a senha" 
                 type="password"
-                placeholder="Informe a confirmação da senha aqui..."
-                onChange={(value) => onChangeHandler({...password, confirmationPassword: value})}
+                placeholder="Repita a senha aqui..."
+                onChange={(value) => onChangeHandler({...password, passwordConfirmation: value})}
                 containerStyle={{
                     width: '85%',
                     marginBottom: 8,

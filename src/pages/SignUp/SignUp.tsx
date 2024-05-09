@@ -5,105 +5,232 @@ import {
     Text, 
     StyleSheet
 } from "react-native";
-import Button from "../../components/Form/Button";
 import ToastManager, { Toast } from "toastify-react-native";
 import StepTemplate from "./Steps/StepTemplate";
-import BasicDataStep from "./Steps/BasicDataSetp";
+import BasicDataStep from "./Steps/BasicDataStep";
 import AddressStep from "./Steps/AddressStep";
 import PasswordStep from "./Steps/PasswordStep";
-import { validateBasicUserData } from "../../services/Validation/validateBasicUserData";
+import { BasicUserDataValidation } from "../../services/Validation/BasicUserDataValidation";
+import { validationService } from "../../services/Validation/validationService";
+import BasicUserDataInterface from "../../Interfaces/Domain/Account/BasicUserDataInterface";
+import AddressInterface from "../../Interfaces/Domain/Account/AddressInterface";
+import NewPasswordInterface from "../../Interfaces/Domain/Account/NewPasswordInterface";
+import NavButtons from "./Steps/NavButtons";
+import { AddressDataValidation } from "../../services/Validation/AddressValidation";
+import { PasswordValidation } from "../../services/Validation/PasswordValidation";
+
+interface Step {
+    title: string,
+    description: string,
+    validationErrors?: Record<string, string | string[]> | []
+    data?: BasicUserDataInterface | AddressInterface | NewPasswordInterface
+}
+
+interface BasicDataStep extends Step {
+    data: BasicUserDataInterface
+}
+
+interface AddressStep extends Step {
+    data: AddressInterface
+}
+
+interface PasswordStep extends Step {
+    data: NewPasswordInterface
+}
+
+interface Steps {
+    basicData: BasicDataStep,
+    address: AddressStep,
+    password: PasswordStep
+}
 
 export default function SignUp({navigation} : {navigation: NativeStackNavigationProp<any, 'SignUp'> }){
-    const [isReadyStep, setIsReadyStep]     = useState<boolean>(false);
-    const [isLoading, setIsLoading]         = useState<boolean>(false);
-    const [stepsConfig, setStepsConfig]     = useState([
-        {
+    const [isReadyStep  , setIsReadyStep  ]     = useState<boolean>(false);
+    const [isLoading    , setIsLoading    ]     = useState<boolean>(false);
+    const [currentStep  , setCurrentStep  ]     = useState<number>(0);
+    const [stepsConfig  , setStepsConfig  ]     = useState<Steps>({
+        basicData: {
             title: 'Dados Pessoais',
             description: 'Vamos começar com seus dados pessoais',
-            component: <BasicDataStep onChange={(basicData, isReady) => onChangeHandler(basicData, isReady)}/>,
-            validationService: validateBasicUserData,
-            validationErrors: []
+            validationErrors: [],
+            data: {
+                firstName: '',
+                lastName: '',
+                email: '',
+                documentType: '',
+                documentNumber: '',
+                birthDate: ''
+            }
         },
-        {
+        address: {
             title: 'Endereço',
             description: 'Agora é importante sabermos seu endereço',
-            component: <AddressStep onChange={(address, isReady) => onChangeHandler(address, isReady)}/>
+            validationErrors: [],
+            data: {
+                zipCode: '',
+                street: '',
+                number: '', 
+                neighborhood: '',
+                city: '',
+                state: '',
+                country: '',
+                reference: '',
+                complement: ''
+            }
         },
-        {
+        password: {
             title: 'Senha',
             description: 'Precisamos que você crie uma senha segura',
-            component: <PasswordStep onChange={(password, isReady) => onChangeHandler(password, isReady)}/>
+            validationErrors: [],
+            data: {
+                password: '',
+                passwordConfirmation: ''
+            }
         }
-    ]);
+    });
 
-    const [currentStep, setCurrentStep] = useState<number>(0);
+    const handleNext = async () => {
+        let validationData = getValidationDataFor(getCurrentStepKey());
+        setIsLoading(true);
+        try {
+            let response = await validationService(validationData);
+            let hasErrors = response?.errors && Object.keys(response.errors).length > 0;
+            
+            if(hasErrors && response?.errors){
+                setErrorsForCurrentStep(response.errors);
+                setIsLoading(false);
+                Toast.error('Uhmm... existem erros de validação nos dados informados, revise os campos e tente avançar novamente. ', 'bottom');
+            }
 
-    const nextStep = () => {
-        if(currentStep === stepsConfig.length - 1) return;
-        setCurrentStep(currentStep + 1);
+            if(!hasErrors){
+                clearErrorsForCurrentStep();
+                setIsLoading(false);
+                setCurrentStep(currentStep + 1);
+                Toast.success('Dados validados com sucesso! Vamos para o próximo passo...', 'bottom');
+            }
+        } catch (error) {
+            setIsLoading(false);
+            Toast.error('Ops! Algo deu errado, tente novamente', 'bottom');
+        }
     }
 
-    const previousStep = () => {
-        if(currentStep === 0) navigation.navigate('Home');
+    const getValidationDataFor = (stepKey: string) => {
+        let possibleValidations = {
+            basicData:  new BasicUserDataValidation(stepsConfig.basicData.data),
+            address:    new AddressDataValidation(stepsConfig.address.data),
+            password:   new PasswordValidation(stepsConfig.password.data)
+        }
+
+        if(stepKey !== 'address' && stepKey !== 'basicData' && stepKey !== 'password' ) throw new Error('Invalid step key');
+        
+        return possibleValidations[stepKey];
+    }
+
+    const handlePrevious = () => {
         setCurrentStep(currentStep - 1);
     }
 
-    const onChangeHandler = (data: Object , isReady: boolean) => 
-    {
-        console.log(data, isReady)
-        setIsReadyStep(isReady);
+    const handleFinish = async () => {
+        let validationData = getValidationDataFor(getCurrentStepKey());
+        setIsLoading(true);
+        try {
+            let response = await validationService(validationData);
+            let hasErrors = response?.errors && Object.keys(response.errors).length > 0;
+            
+            if(hasErrors && response?.errors){
+                setErrorsForCurrentStep(response.errors);
+                setIsLoading(false);
+                Toast.error('Uhmm... existem erros de validação nos dados informados, revise os campos e tente avançar novamente. ', 'bottom');
+            }
+
+            if(!hasErrors){
+                clearErrorsForCurrentStep();
+                setIsLoading(false);
+                Toast.success('Sua conta foi cadastrada com sucesso, seja bem vindo ao FarrigaTec.', 'bottom');
+            }
+        } catch (error) {
+            setIsLoading(false);
+            Toast.error('Ops! Algo deu errado, tente novamente', 'bottom');
+        }
     }
 
-    let NavButtons = () => {
-        return(
-            <View>
-                { currentStep <= stepsConfig.length - 1  && 
-                    <Button
-                        text={currentStep === stepsConfig.length -1 && 'Finalizar' || 'Próximo'} 
-                        loading={isLoading}
-                        onPress={() => nextStep()}
-                        containerStyle={{
-                            marginVertical: 16,
-                            width: '85%',
-                            alignSelf: 'center'
-                        }}
-                        disabled={!isReadyStep}
-                />}
+    const handleCancel = () => {
+        navigation.navigate('Home');
+    }
 
-                { currentStep >= 0 && 
-                    <Button
-                        text={currentStep === 0 ? 'Cancelar' : 'Anterior'}
-                        type='outlined'
-                        onPress={() => previousStep()}
-                        containerStyle={{
-                            width: '85%',
-                            alignSelf: 'center'
-                        }} 
-                        disabled={isLoading}   
-                    />
-                }
-            </View>
-        )
-    }   
+    const getCurrentStepKey = () => {
+        return Object.keys(stepsConfig)[currentStep];
+    }
+
+    const clearErrorsForCurrentStep = () => {
+        setStepsConfig({...stepsConfig, [getCurrentStepKey()]: {...Object.values(stepsConfig)[currentStep], validationErrors: []}});
+    }
+
+    const setErrorsForCurrentStep = (errors: Record<string, string[]>) => {
+        setStepsConfig({...stepsConfig, [getCurrentStepKey()]: {...Object.values(stepsConfig)[currentStep], validationErrors: errors}});
+    }
+
+    const onChangeDataHandler = (data: BasicUserDataInterface | AddressInterface | NewPasswordInterface, isReady: boolean) => {
+        setIsReadyStep(isReady);
+        setStepsConfig({...stepsConfig, [getCurrentStepKey()]: {...Object.values(stepsConfig)[currentStep], data}});
+    }
 
     return (
         <StepTemplate
-            description={stepsConfig[currentStep].description}
+            description={Object.values(stepsConfig)[currentStep].description}
             currentStepNumber={currentStep + 1}
-            title={stepsConfig[currentStep].title}
+            title={Object.values(stepsConfig)[currentStep].title}
         >
+
             <ToastManager
                 height={'auto'}
                 textStyle={{fontSize: 16, padding: 8, textAlign: 'center'}}
                 style={{paddingRight: 32, width: 'auto', marginHorizontal: '5%'}}
                 positionValue={100}
+                duration={5000}
             />
-                {stepsConfig[currentStep].component}
-            <NavButtons/>
+
+            {Object.keys(stepsConfig)[currentStep] == 'basicData' && 
+            <BasicDataStep 
+                onChange={(basicData, isReady) => onChangeDataHandler(basicData, isReady)}
+                initialValues={Object.values(stepsConfig)[currentStep].data as BasicUserDataInterface || {}}    
+                validationErrors={Object.values(stepsConfig)[currentStep].validationErrors || []}
+            />
+            }
+
+            {Object.keys(stepsConfig)[currentStep] == 'address' && 
+            <AddressStep 
+                onChange={(address, isReady) => onChangeDataHandler(address, isReady)}
+                initialValues={Object.values(stepsConfig)[currentStep].data as AddressInterface || {}} 
+                validationErrors={Object.values(stepsConfig)[currentStep].validationErrors || []}     
+            />
+            }
+
+            {Object.keys(stepsConfig)[currentStep] == 'password' && 
+                <PasswordStep 
+                    onChange={(password, isReady) => onChangeDataHandler(password, isReady)}
+                    initialValues={Object.values(stepsConfig)[currentStep].data as NewPasswordInterface || {}}
+                    validationErrors={Object.values(stepsConfig)[currentStep].validationErrors || []}
+                />
+            }
+            
+            <NavButtons
+                preventDefault
+                numberOfSteps={Object.keys(stepsConfig).length}
+                isLoading={isLoading}
+                isReadyStep={isReadyStep}
+                currentStep={currentStep}
+                onNext={() => handleNext()}
+                onPrevious={handlePrevious}
+                onFinished={handleFinish}
+                onCancel={handleCancel}
+            />
+
             <Text style={{textAlign: 'center', fontSize: 16, marginTop: 24}}>Já possui uma conta? <Text style={formStyles.ancor} onPress={() => navigation.navigate('Login')}>Acesse agora!</Text></Text>
         </StepTemplate> 
     )
 }
+
 const formStyles = StyleSheet.create({
     container: {
         flex:1,

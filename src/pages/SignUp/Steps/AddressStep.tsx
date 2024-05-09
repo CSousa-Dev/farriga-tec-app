@@ -1,56 +1,55 @@
 import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AddressInterface from "../../../Interfaces/Domain/Account/AddressInterface";
 
 
 interface AddressProps {
-    onChange: (data: Address, isReadyStep: boolean) => void;
+    onChange: (data: AddressInterface, isReadyStep: boolean) => void;
     validationErrors?: Record<string, string[]>;
-}
-
-interface Address {
-    zipCode: string;
-    street: string;
-    number: string;
-    neighborhood: string;
-    city: string;
-    state: string;
-    complement: string;
-    reference: string;
+    initialValues ?: AddressInterface;
 }
 
 export default function AddressStep(props: AddressProps)
 {
     const maxHeight = Dimensions.get('window').height * 0.4;
-    const [address, setAddress] = useState<Address>({
-        zipCode: '',
-        street: '',
-        number: '',
-        neighborhood: '',
-        city: '',
-        state: '',
-        complement: '',
-        reference: ''
+    const [address, setAddress] = useState<AddressInterface>({
+        zipCode: props.initialValues?.zipCode || '',
+        street: props.initialValues?.street || '',
+        number: props.initialValues?.number || '',
+        neighborhood: props.initialValues?.neighborhood || '',
+        city: props.initialValues?.city || '',
+        state: props.initialValues?.state || '',
+        country: props.initialValues?.country || '',
+        complement: props.initialValues?.complement || '',
+        reference: props.initialValues?.reference || ''
     });
-    const [isStepReady, setIsStepReady] = useState<boolean>(false);
+    const [isStepReady, setIsStepReady] = useState<boolean>(true);
 
-    const onChangeHandler = async (address: Address) => {
-        const isReady = checkStepIsReady();
-        setIsStepReady(isReady);
+    useEffect(() => {
+        onChangeHandler(address);
+    },[])
+
+    const onChangeHandler = (address: AddressInterface) => {
         setAddress(address);
-        props.onChange(address, isReady);
+        const isRead = checkStepIsReady(address);
+        setIsStepReady(isRead);
+        props.onChange(address, isRead);
     }
 
-    const checkStepIsReady = () => {
-        let someFieldIsFilled = isSomeFieldFilled();
-        return someFieldIsFilled && everyFieldsIsFilled();
+    const checkStepIsReady = (address: AddressInterface) => {
+        let someFieldIsFilled = isSomeFieldFilled(address);
+
+        if(!someFieldIsFilled) return true;
+
+        return someFieldIsFilled && everyFieldsIsFilled(address);
     }
 
-    const isSomeFieldFilled = () => {
+    const isSomeFieldFilled = (address: AddressInterface) => {
         return Object.values(address).some(value => value.length > 0);
     }
 
-    const everyFieldsIsFilled = () => {
+    const everyFieldsIsFilled = (address: AddressInterface) => {
         const { complement, reference, ...fields } = address;
         return Object.values(fields).every(value => value.length > 0);
     }
@@ -128,6 +127,18 @@ export default function AddressStep(props: AddressProps)
                 label="Estado" 
                 placeholder="Ex: SP"
                 onChange={(value) => onChangeHandler({...address, state: value})}
+                containerStyle={{
+                    width: '85%',
+                    marginBottom: 8,
+                    alignSelf: 'center'
+                }}
+                validationErrors={props.validationErrors && props.validationErrors['state'] || []}
+            />
+            <Input 
+                value={address.country}
+                label="País" 
+                placeholder="Ex: Brasil"
+                onChange={(value) => onChangeHandler({...address, country: value})}
                 containerStyle={{
                     width: '85%',
                     marginBottom: 8,

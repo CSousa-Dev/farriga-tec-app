@@ -34,10 +34,7 @@ export default function MaskedInput(props: MaskedInputProps) {
             }
         }
 
-        console.log(props.format[result.length], result.length - 1)
-
         if(lastPressedKey == "Backspace" && props.format[result.length - 1] !== "#" && props.format[result.length - 1] !== undefined){
-            console.log(props.format[result.length - 2])
             result = result.slice(0, -1)
         }
     

@@ -1,34 +1,33 @@
 import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
-import { useState } from "react";
-import TextInput from "../../../components/Form/Input/TextInput";
+import { useEffect, useState } from "react";
+import BasicUserDataInterface from "../../../Interfaces/Domain/Account/BasicUserDataInterface";
 
 interface BasicDataStepProps {
-    onChange: (data: BasicData, isReadyStep: boolean) => void;
+    onChange: (data: BasicUserDataInterface, isReadyStep: boolean) => void;
     validationErrors?: Record<string, string[]>;
-}
-
-interface BasicData {
-    firstName: string;
-    lastName: string;
-    document: string;
-    birthDate: string;
-    email: string;
+    initialValues ?: BasicUserDataInterface;
 }
 
 export default function BasicDataStep(props: BasicDataStepProps)
 {
     const maxHeight = Dimensions.get('window').height * 0.4;
-    const [basicData, setBasicData] = useState<BasicData>({
-        firstName: '',
-        lastName: '',
-        document: '',
-        birthDate: '',
-        email: ''
+    const [basicData, setBasicData] = useState<BasicUserDataInterface>({
+        firstName: props.initialValues?.firstName || '',
+        lastName: props.initialValues?.lastName || '',
+        documentNumber: props.initialValues?.documentNumber || '',
+        documentType: 'CPF',
+        birthDate: props.initialValues?.birthDate || '',
+        email: props.initialValues?.email || ''
     });
     const [isStepReady, setIsStepReady] = useState<boolean>(false);
 
-    const onChangeHandler = (basicData: BasicData) => {
+    useEffect(() => {
+        console.log(props.validationErrors, 'validationErrorsInBasicStep')
+        onChangeHandler(basicData);
+    },[])
+
+    const onChangeHandler = (basicData: BasicUserDataInterface) => {
         const isReady = Object.values(basicData).every(value => value.length > 0);
         setIsStepReady(isReady);
         setBasicData(basicData);
@@ -70,13 +69,13 @@ export default function BasicDataStep(props: BasicDataStepProps)
                 validationErrors={props.validationErrors && props.validationErrors['lastName'] || []}
             />
             <Input 
-                value={basicData.document}
+                value={basicData.documentNumber}
                 keyboardType="numeric"
-                label="CPF" 
+                label={basicData.documentType} 
                 type="text"
                 format="###.###.###-##"
                 placeholder="Informe seu nome aqui..."
-                onChange={(value) => onChangeHandler({...basicData, document: value})}
+                onChange={(value) => onChangeHandler({...basicData, documentNumber: value})}
                 containerStyle={{
                     width: '85%',
                     marginBottom: 8,
