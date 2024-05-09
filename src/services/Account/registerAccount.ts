@@ -30,7 +30,7 @@ interface ApiMappedError {
 
 export default async function registerAccount(requestBody: RegisterAccountRequestInterface) : Promise<null | ApiMappedError> {
     
-    const response = await api.post('account', {...requestBody});
+    const response = await api.post('account',requestBody);
     if(response.status === 200) return null;
     return response.data;
 }
