@@ -17,7 +17,7 @@ import NewPasswordInterface from "../../Interfaces/Domain/Account/NewPasswordInt
 import NavButtons from "./Steps/NavButtons";
 import { AddressDataValidation } from "../../services/Validation/AddressValidation";
 import { PasswordValidation } from "../../services/Validation/PasswordValidation";
-import registerAccount, { RegisterAccountRequestInterface } from "../../services/Account/RegisterAccount";
+import registerAccount, { RegisterAccountRequestInterface } from "../../services/Account/registerAccount";
 
 interface Step {
     title: string,
@@ -92,6 +92,14 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
     const handleNext = async () => {
         let validationData = getValidationDataFor(getCurrentStepKey());
         setIsLoading(true);
+
+        if(getCurrentStepKey() == 'address' && everyFieldsIsEmpty(validationData.getBody())) {
+            setIsLoading(false);
+            clearErrorsForCurrentStep();
+            setCurrentStep(currentStep + 1);
+            return;
+        }
+
         try {
             let response = await validationService(validationData);
             let hasErrors = response?.errors && Object.keys(response.errors).length > 0;
@@ -126,6 +134,10 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
         return possibleValidations[stepKey];
     }
 
+    const everyFieldsIsEmpty = (data: Object) => {
+        return Object.values(data).every(value => value === '' || value === null || value === undefined);
+    }
+
     const handlePrevious = () => {
         setCurrentStep(currentStep - 1);
     }
@@ -144,9 +156,11 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
             }
 
             if(!hasErrors){
+                setIsLoading(false);
                 clearErrorsForCurrentStep();
                 register();
                 Toast.success('Sua conta foi cadastrada com sucesso, seja bem vindo ao FarrigaTec.', 'bottom');
+                navigation.navigate('Login');
             }
         } catch (error) {
             setIsLoading(false);
@@ -260,7 +274,7 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
             <NavButtons
                 preventDefault
                 numberOfSteps={Object.keys(stepsConfig).length}
-                isLoading={false}
+                isLoading={isLoading}
                 isReadyStep={isReadyStep}
                 currentStep={currentStep}
                 onNext={() => handleNext()}
