@@ -169,7 +169,7 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
     }
 
     const handleCancel = () => {
-        navigation.navigate('Home');
+        navigation.navigate('Initial');
     }
 
     const getCurrentStepKey = () => {

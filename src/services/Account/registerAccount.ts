@@ -1,4 +1,4 @@
-import { api } from "../api";
+import  Api  from "../Api";
 
 export interface RegisterAccountRequestInterface {
     firstName: string;
@@ -29,8 +29,8 @@ interface ApiMappedError {
 }
 
 export default async function registerAccount(requestBody: RegisterAccountRequestInterface) : Promise<null | ApiMappedError> {
-    
-    const response = await api.post('account',requestBody);
+    const api = new Api();
+    const response = await api.getInstance().post('account',requestBody);
     if(response.status === 200) return null;
     return response.data;
 }

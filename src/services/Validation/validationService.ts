@@ -1,4 +1,4 @@
-import { api } from "../api"
+import Api from "../Api"
 
 export interface PasswordValidationInterface extends ServiceValidationDataInterface {
     service: 'PASSWORD'
@@ -47,6 +47,7 @@ export type ResponseFieldByFieldValidationType = {
 
 
 export async function validationService(validationData: BasicUserDataValidationInterface | AddressDataValidationInterface | PasswordValidationInterface): Promise<ResponseFieldByFieldValidationType | null> {
-    const response = await api.post(`validation/${validationData.service}`, {fields: validationData.getBody()})
+    const api = new Api()
+    const response = await api.getInstance().post(`validation/${validationData.service}`, {fields: validationData.getBody()})
     return response.data
 }

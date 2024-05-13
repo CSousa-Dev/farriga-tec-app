@@ -1,102 +1,45 @@
-import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
-import Button from "../components/Form/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { View, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import RNEventSource from 'react-native-event-source'
+import EventSource from "react-native-sse";
 
-export default function Home({navigation} : {navigation: NativeStackNavigationProp<any, 'Home'> }){
+
+export default function Home({ navigation }: { navigation: NativeStackNavigationProp<any, 'Login'> }) {
+    
+    const [token, setToken] = useState('' as string);
+    const [data, setData] = useState('' as string);
+    
+    useEffect(() => {
+        const getToken = async () => {
+            try {
+                const token = await AsyncStorage.getItem('@token');
+                setToken(token as string);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getToken();
+        console.log('oi');
+
+        const eventSource = new EventSource('http://192.168.15.45:8000/api/irrigation/events');
+        eventSource.addEventListener('open', (event: any) => {console.log('')})
+        eventSource.addEventListener('message', (event: any) => {
+            console.log(event)
+        });
+        
+        return () => {
+            eventSource.close();
+        };
+
+    }, []);
+
     return (
-        <ImageBackground 
-            style={{
-                flex: 1,
-                justifyContent: 'center',
-            }}
-            source={require('../../assets/farm.jpg')} 
-        >
-        <View 
-            style={baseStyles.container}
-        >
-            <Image 
-                style={{
-                    alignSelf: 'center',
-                    resizeMode: 'contain',
-                    height: 100,
-                    marginBottom: 16
-
-                }}
-                alt='logo Irrigatec' 
-                source={require('../../assets/FarrigaTecLog.png')}
-            />
-            <Text style={textContentStyles.title}> Seja bem vindo!</Text>
-            <Text style={textContentStyles.slogan}> Revolucionando a produção agrícola em pequenas e médias plantações.</Text>
-            <Button 
-                onPress={() => navigation.navigate('Login')}
-                text="Entre" 
-                containerStyle={{
-                    width: '80%',
-                    alignSelf: 'center'                
-                }}
-            />
-            <View style={dividerStyles.container}>
-                <View style={dividerStyles.row} />
-                <Text style={dividerStyles.text}>ou</Text>
-                <View style={dividerStyles.row} />
-            </View>
-            <Button 
-                text="Cadastre-se" 
-                type="outlined"
-                containerStyle={{
-                    width: '80%',
-                    alignSelf: 'center'
-                }}
-                onPress={() => navigation.navigate('SignUp')}
-            />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Token: {token}</Text>
+            <Text>Event Stream Data: {data}</Text>
         </View>
-        </ImageBackground>
-    )
+    );
 }
-
-const baseStyles = StyleSheet.create({
-    container: {
-        flex: .65,
-        textAlign: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 30,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        height: 'auto'
-    },
-})
-
-const textContentStyles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        textAlign: 'center',
-        fontWeight: '500',
-        marginHorizontal: 10,
-        color: '#235818'
-    },
-    slogan: {
-        fontSize: 16,
-        marginHorizontal: 10,
-        marginBottom: 32,
-        color: '#235818',
-        textAlign: 'center'
-    }
-})
-
-const dividerStyles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 70,
-        marginVertical: 16
-    },
-    row: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#147a00'
-    },
-    text: {
-        fontSize: 18,
-        marginHorizontal: 10,
-        color: '#235818'
-    }
-})

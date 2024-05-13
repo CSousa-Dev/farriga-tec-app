@@ -12,12 +12,17 @@ import {
 import Button from "../components/Form/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Input from "../components/Form/Input/Input";
+import login from "../services/Account/login";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AxiosResponse } from "axios";
 
 
 export default function Login({navigation} : {navigation: NativeStackNavigationProp<any, 'Login'> }){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
   
+    
     const handlePassword = (text: string) => {
         setPassword(text);
     };
@@ -26,9 +31,28 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
         setEmail(text);
     };
 
-    const handleLogin = () => {
-        alert('Email: ' + email + ' Senha: ' + password);
+    const handleChange = () => {
+
+    }
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+        try {
+            const response = await login({
+                username: email,
+                password: password
+            }, navigation);
+
+            let token = (response as AxiosResponse).data.token;
+            await AsyncStorage.setItem('@token', token);
+            setIsLoading(false);
+            navigation.navigate('Home');
+        } catch (error) {
+            setIsLoading(false);
+        }
     };
+
+
     return (
         <KeyboardAvoidingView
             style={{flex: 1}}
@@ -59,6 +83,7 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                         />
                         <Text style={formStyles.title}>Informe os dados e clique em entrar para acessar sua conta.</Text>
                         <Input 
+                            value={email}
                             label="E-mail" 
                             placeholder="email@example.com" 
                             containerStyle={{
@@ -66,8 +91,10 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                                 marginBottom: 8,
                                 alignSelf: 'center'
                             }}
+                            onChange={handleEmail}
                         />
                         <Input 
+                            value={password}
                             label="Senha" 
                             type="password"
                             placeholder="Informe sua senha aqui..."
@@ -75,15 +102,18 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                                 width: '85%',
                                 alignSelf: 'center'
                             }}
+                            onChange={handlePassword}
                         />
                         <Button
                             text='Entrar' 
-                            onPress={() => alert('Google')}
+                            onPress={() => handleLogin()}
                             containerStyle={{
                                 marginVertical: 24,
                                 width: '85%',
                                 alignSelf: 'center'
-                            }}    
+                            }}
+                            loading={isLoading}  
+                            disabled={email == ''|| password == ''}  
                         />
                         <Text style={{textAlign: 'center', fontSize: 16}}>Ainda não possui uma conta? <Text style={formStyles.ancor} onPress={() => navigation.navigate('SignUp')}>Cadastre-se</Text></Text>
                     </View>
