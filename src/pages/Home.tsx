@@ -1,9 +1,9 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { View, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
-import RNEventSource from 'react-native-event-source'
+import React, { useEffect, useState } from "react";
 import EventSource from "react-native-sse";
+import ModelFarrigaOne from "../components/Devices/Models/FarrigaOne/ModelFarrigaOne";
+
 
 
 export default function Home({ navigation }: { navigation: NativeStackNavigationProp<any, 'Login'> }) {
@@ -36,10 +36,9 @@ export default function Home({ navigation }: { navigation: NativeStackNavigation
 
     }, []);
 
+    let colors = ['#045f18', '#1d722b', '#228d34','#1d4926'];
+
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Token: {token}</Text>
-            <Text>Event Stream Data: {data}</Text>
-        </View>
+       <ModelFarrigaOne/>
     );
 }

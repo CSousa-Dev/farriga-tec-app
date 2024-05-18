@@ -36,20 +36,21 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
     }
 
     const handleLogin = async () => {
-        setIsLoading(true);
-        try {
-            const response = await login({
-                username: email,
-                password: password
-            }, navigation);
+        navigation.navigate('Home');
+        // setIsLoading(true);
+        // try {
+        //     const response = await login({
+        //         username: email,
+        //         password: password
+        //     }, navigation);
 
-            let token = (response as AxiosResponse).data.token;
-            await AsyncStorage.setItem('@token', token);
-            setIsLoading(false);
-            navigation.navigate('Home');
-        } catch (error) {
-            setIsLoading(false);
-        }
+        //     let token = (response as AxiosResponse).data.token;
+        //     await AsyncStorage.setItem('@token', token);
+        //     setIsLoading(false);
+        //     navigation.navigate('Home');
+        // } catch (error) {
+        //     setIsLoading(false);
+        // }
     };
 
 
@@ -113,7 +114,7 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                                 alignSelf: 'center'
                             }}
                             loading={isLoading}  
-                            disabled={email == ''|| password == ''}  
+                            // disabled={email == ''|| password == ''}  
                         />
                         <Text style={{textAlign: 'center', fontSize: 16}}>Ainda não possui uma conta? <Text style={formStyles.ancor} onPress={() => navigation.navigate('SignUp')}>Cadastre-se</Text></Text>
                     </View>

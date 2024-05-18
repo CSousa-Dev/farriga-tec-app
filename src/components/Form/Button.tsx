@@ -24,13 +24,13 @@ export default function Button(props: ButtonProps) {
         return <Text style={selectedStyle.text}>{props.text}</Text>
     };
 
-    let colors = props.disabled ? ['#CCCCCC', '#CCCCCC', '#CCCCCC'] : ['#0f9e20', '#16420d', '#0f9e20']
+    let colors = props.disabled ? ['#CCCCCC', '#CCCCCC', '#CCCCCC'] : ['#045f18', '#1d722b', '#1d4926']
     let Gradient = (): ReactElement => {
         return (
             <LinearGradient
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
-            style={{borderRadius: 4, minHeight: 60, justifyContent: 'center'}}
+            style={{borderRadius: 12, minHeight: 60, justifyContent: 'center', elevation: 32}}
             colors={colors}
             >  
                 <StyledText/>
@@ -83,7 +83,7 @@ type Button = {
 
 const filledStyle: StyleSheet.NamedStyles<Button> = StyleSheet.create({
     button: {
-        borderRadius: 4,
+        borderRadius: 8,
     },
     text: {
         color: '#fff',
@@ -99,7 +99,7 @@ const outlinedStyle: StyleSheet.NamedStyles<Button>  = StyleSheet.create({
         backgroundColor: '#ececec',
         borderWidth: 1,
         borderColor: '#0f9e20',
-        borderRadius: 4,
+        borderRadius: 12,
     },
     text: {
         fontSize: 16,
