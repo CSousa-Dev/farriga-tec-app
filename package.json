@@ -11,13 +11,17 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/datetimepicker": "7.7.0",
+    "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@types/paho-mqtt": "^1.0.10",
     "axios": "^1.6.8",
     "buffer": "^6.0.3",
+    "crypto-js": "^4.2.0",
     "expo": "^51.0.2",
     "expo-linear-gradient": "~13.0.2",
+    "expo-local-authentication": "~14.0.1",
+    "expo-secure-store": "~13.0.1",
     "expo-status-bar": "~1.12.1",
     "mqtt": "^5.5.5",
     "paho-mqtt": "^1.1.0",
@@ -34,6 +38,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/react": "~18.2.45",
     "@types/react-native-event-source": "^1.1.2",
     "typescript": "~5.3.3"
