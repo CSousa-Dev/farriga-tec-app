@@ -160,7 +160,7 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
                 clearErrorsForCurrentStep();
                 register();
                 Toast.success('Sua conta foi cadastrada com sucesso, seja bem vindo ao FarrigaTec.', 'bottom');
-                navigation.navigate('Login');
+                navigation.navigate('Welcome');
             }
         } catch (error) {
             setIsLoading(false);
@@ -313,13 +313,3 @@ const formStyles = StyleSheet.create({
     }
 });
 
-const baseStyles = StyleSheet.create({
-    container: {
-        textAlign: 'center',
-        justifyContent: 'flex-start',
-        paddingVertical: 32,
-        paddingHorizontal: 30,
-        backgroundColor: 'rgba(255, 255, 255, 0.952)',
-        minHeight: '85%'
-    },
-})
