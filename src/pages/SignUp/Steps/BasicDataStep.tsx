@@ -2,6 +2,7 @@ import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
 import { useEffect, useState } from "react";
 import BasicUserDataInterface from "../../../Interfaces/Domain/Account/BasicUserDataInterface";
+import SlideHorizontal from "../../../components/Animation/SlideHorizontal";
 
 interface BasicDataStepProps {
     onChange: (data: BasicUserDataInterface, isReadyStep: boolean) => void;
@@ -35,10 +36,11 @@ export default function BasicDataStep(props: BasicDataStepProps)
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <SlideHorizontal style={{ flex: 1 }}>
         <ScrollView
             style={{ maxHeight, overflow: 'hidden' }}
             showsVerticalScrollIndicator={true}
+            persistentScrollbar={true}
         >                
             <Input 
                 value={basicData.firstName}
@@ -114,6 +116,6 @@ export default function BasicDataStep(props: BasicDataStepProps)
                 Informe todos os campos para prosseguir.
             </Text>
         }
-    </View>
+    </SlideHorizontal>
     )
 }

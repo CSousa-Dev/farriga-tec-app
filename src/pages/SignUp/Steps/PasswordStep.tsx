@@ -2,6 +2,7 @@ import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
 import { useEffect, useState } from "react";
 import NewPasswordInterface from "../../../Interfaces/Domain/Account/NewPasswordInterface";
+import SlideHorizontal from "../../../components/Animation/SlideHorizontal";
 
 interface PasswordProps {
     onChange: (data: NewPasswordInterface, isReady: boolean) => void;
@@ -35,7 +36,7 @@ export default function PasswordStep(props: PasswordProps)
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <SlideHorizontal style={{ flex: 1 }}>
         <ScrollView
             style={{ maxHeight, overflow: 'hidden' }}
             showsVerticalScrollIndicator={true}
@@ -71,6 +72,6 @@ export default function PasswordStep(props: PasswordProps)
                 É necessário que as senhas sejam iguais e preenchidas.
             </Text>
         }
-    </View>
+    </SlideHorizontal>
     )
 }

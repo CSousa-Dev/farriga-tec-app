@@ -2,6 +2,7 @@ import { Dimensions, ScrollView, View, Text } from "react-native";
 import Input from "../../../components/Form/Input/Input";
 import { useEffect, useState } from "react";
 import AddressInterface from "../../../Interfaces/Domain/Account/AddressInterface";
+import SlideHorizontal from "../../../components/Animation/SlideHorizontal";
 
 
 interface AddressProps {
@@ -55,7 +56,7 @@ export default function AddressStep(props: AddressProps)
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <SlideHorizontal style={{ flex: 1 }}>
         <ScrollView
             style={{ maxHeight, overflow: 'hidden' }}
             showsVerticalScrollIndicator={true}
@@ -176,6 +177,6 @@ export default function AddressStep(props: AddressProps)
                 Ao informar um campo do endereço todos os demais campos são obrigatórios exceto o complemento e referência.
             </Text>
         }
-    </View>
+    </SlideHorizontal>
     )
 }
