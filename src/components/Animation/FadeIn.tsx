@@ -4,14 +4,16 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from '
 interface FadeInViewProps {
   children: React.ReactNode;
   style?: object;
+  duration?: number;
 }
 
 export default function FadeIn(props: FadeInViewProps) {
   const opacity = useSharedValue(0); // Valor inicial de opacidade: 0
 
   useEffect(() => {
+    let duration = props.duration || 750;
     opacity.value = withTiming(1, {
-      duration: 750, 
+      duration: duration, // Duração da animação: 750ms
       easing: Easing.inOut(Easing.ease),
     });
   }, [opacity]);

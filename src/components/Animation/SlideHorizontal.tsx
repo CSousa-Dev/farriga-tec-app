@@ -5,10 +5,11 @@ interface SlideInViewProps {
   children: React.ReactNode;
   style?: object;
   delayDuration?: number;
+  direction?: 'left-to-rigth' | 'right-to-left';
 }
 
-export default function Slide(props: SlideInViewProps) {
-  const translateX = useSharedValue(-300); // Valor inicial fora da tela à esquerda
+export default function SlideHorizontal(props: SlideInViewProps) {
+  const translateX = useSharedValue(props.direction && props.direction == 'right-to-left' ? 300 : -300);
 
   useEffect(() => {
 
