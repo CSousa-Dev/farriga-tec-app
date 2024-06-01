@@ -17,7 +17,7 @@ class Api implements ApiInterface {
 
     constructor() {
         this.axiosInstance = axios.create({
-            baseURL: 'http://192.168.15.45:8000/api/',
+            baseURL: process.env.API_URL,
             headers: {
                 'Accept': 'application/json'
             }
