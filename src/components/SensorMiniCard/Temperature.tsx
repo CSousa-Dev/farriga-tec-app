@@ -1,7 +1,7 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Text } from "react-native";
 import { BaseStyle } from './BaseStyle';
-import FadeIn from '../FadeIn';
+import FadeIn from '../Animation/FadeIn';
 
 export default function Temperature({value}: {value: number}) {
     return (

@@ -3,7 +3,6 @@ import AirHumidity from "../../../SensorMiniCard/AirHumidity";
 import SoilMoisture from "../../../SensorMiniCard/SoilMoisture";
 import Temperature from "../../../SensorMiniCard/Temperature";
 import Rain from "../../../SensorMiniCard/Rain";
-import FadeIn from "../../../FadeIn";
 
 interface FarrigaOneMiniSensorsWrapperProps {
     airHumidityValue: number;

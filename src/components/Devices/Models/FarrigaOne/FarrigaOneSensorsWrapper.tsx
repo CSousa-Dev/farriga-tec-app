@@ -2,7 +2,9 @@ import { View } from "react-native";
 import SensorCard from "../../../SensorCard/SensorCard"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import Slide from "../../../Slide";
+import SlideHorizontal from "../../../Animation/SlideHorizontal";
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 interface FarrigaOneSensorWrapperProps {
     airUmidity: {
@@ -59,7 +61,7 @@ export default function FarrigaOneSensorsWrapper(props: FarrigaOneSensorWrapperP
 {
     return (
         <View style={{width: '100%', alignItems: 'center'}}>
-            <Slide style={{width: '100%', alignItems: 'center'}}>
+            <SlideHorizontal style={{width: '100%', alignItems: 'center'}}>
                 <SensorCard
                     title="Umidade do Ar"
                     lastUpdate={props.airUmidity.lastUpdate}
@@ -75,8 +77,8 @@ export default function FarrigaOneSensorsWrapper(props: FarrigaOneSensorWrapperP
                         props.airUmidity.sensibility
                     }
                 />
-            </Slide>
-            <Slide style={{width: '100%', alignItems: 'center'}} delayDuration={100}>
+            </SlideHorizontal>
+            <SlideHorizontal style={{width: '100%', alignItems: 'center'}} delayDuration={100}>
                 <SensorCard
                     title="Umidade do Solo"
                     lastUpdate={props.soilMoisture.lastUpdate}
@@ -96,8 +98,8 @@ export default function FarrigaOneSensorsWrapper(props: FarrigaOneSensorWrapperP
                         max: 70
                     }}
                 />
-            </Slide>
-            <Slide style={{width: '100%', alignItems: 'center'}} delayDuration={200}>
+            </SlideHorizontal>
+            <SlideHorizontal style={{width: '100%', alignItems: 'center'}} delayDuration={200}>
                 <SensorCard
                     title="Temperatura"
                     lastUpdate={props.temperature.lastUpdate}
@@ -113,8 +115,8 @@ export default function FarrigaOneSensorsWrapper(props: FarrigaOneSensorWrapperP
                         props.temperature.sensibility
                     }
                 />
-            </Slide>
-            <Slide style={{width: '100%', alignItems: 'center'}} delayDuration={300}>
+            </SlideHorizontal>
+            <SlideHorizontal style={{width: '100%', alignItems: 'center'}} delayDuration={300}>
                 <SensorCard
                     title="Chuva"
                     lastUpdate={props.rain.lastUpdate}
@@ -123,10 +125,10 @@ export default function FarrigaOneSensorsWrapper(props: FarrigaOneSensorWrapperP
                     on={props.rain.on}
                     onChangePower={() => props.rain.onChangePower(true)}
                     icon={
-                        <FontAwesome6 name="temperature-half" size={24} color="#25572d"/>
+                        <Ionicons name="rainy" size={24} color="#25572d" />
                     }
                 />
-            </Slide>
+            </SlideHorizontal>
         </View>
     )
 }

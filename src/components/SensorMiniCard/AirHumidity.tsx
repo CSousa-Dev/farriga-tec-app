@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Text } from "react-native";
 import { BaseStyle } from './BaseStyle';
-import FadeIn from '../FadeIn';
+import FadeIn from '../Animation/FadeIn';
 
 export default function AirHumidity({value}: {value: number}) {
     return (

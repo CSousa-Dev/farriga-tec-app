@@ -7,7 +7,40 @@ import { useState } from "react";
 import FarrigaOneSensorsWrapper from "./FarrigaOneSensorsWrapper";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-export default function ModelFarrigaOne() {
+interface ModelFarrigaOneProps {
+    isConnect: boolean;
+    connectionMessage: string;
+    deviceName: string;
+    status: string;
+    lastIrrigation: string;
+    sensorsMetrics: {
+        airHumidity: {
+            value: number;
+            status: string;
+            lastUpdate: string;
+            sensibility: number;
+        };
+        soilMoisture: {
+            value: number;
+            status: string;
+            lastUpdate: string;
+            sensibility: number;
+        };
+        temperature: {
+            value: number;
+            status: string;
+            lastUpdate: string;
+            sensibility: number;
+        };
+        rain: {
+            isRain: boolean;
+            status: string;
+            lastUpdate: string;
+        };      
+    } 
+}
+
+export default function ModelFarrigaOne(props: ModelFarrigaOneProps) {
 
     const [colapse, setColapse] = useState(false);
     const rotation = useSharedValue(0);

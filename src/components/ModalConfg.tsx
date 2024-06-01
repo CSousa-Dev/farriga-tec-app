@@ -3,8 +3,7 @@ import { Modal, View, Text } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import Button from "./Form/Button";
 import { useState } from "react";
-import FadeIn from "./FadeIn";
-import Slide from "./Slide";
+import SlideHorizontal from "./Animation/SlideHorizontal";
 
 interface ModalConfigProps {
     onClose: () => void;
@@ -55,7 +54,7 @@ export default function ModalConfig(props: ModalConfigProps) {
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <Slide
+                <SlideHorizontal
                     style={{
                         backgroundColor: '#ffffff',
                         width: '85%',
@@ -118,7 +117,7 @@ export default function ModalConfig(props: ModalConfigProps) {
                         <Button text="Cancelar" type="outlined" containerStyle={{width: 120}} onPress={() => onClose()}/>
                         <Button text="Salvar" containerStyle={{width: 120}} onPress={() => props.onSave(fill)}/>
                     </View>
-                </Slide>
+                </SlideHorizontal>
             </View>
         </Modal>
     )

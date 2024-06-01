@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text } from "react-native";
 import { BaseStyle } from './BaseStyle';
-import FadeIn from '../FadeIn';
+import FadeIn from '../Animation/FadeIn';
 
 export default function Rain({isRain}: {isRain: boolean}) {
     return (
