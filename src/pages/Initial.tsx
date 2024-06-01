@@ -96,6 +96,7 @@ const dividerStyles = StyleSheet.create({
     },
     text: {
         fontSize: 18,
+        minWidth: 25,
         marginHorizontal: 10,
         color: '#235818'
     }
