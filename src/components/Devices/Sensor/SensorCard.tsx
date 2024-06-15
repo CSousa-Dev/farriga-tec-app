@@ -1,26 +1,22 @@
 import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
-import OnOffButton from "../OnOffButton";
-import ModalConfig from "../Devices/Sensor/ModalConfig";
+
 import { useState } from "react";
 import { Feather } from '@expo/vector-icons';
 import React from "react";
+import IconSelector from "./IconSelector";
+import ModalConfig from "./ModalConfig";
+import OnOffButton from "../../OnOffButton";
 
 interface SensorCardProps {
-    sensibility?: {
-        label: string;
-        onChangeSensibility: (value: number) => void;
-        value: number;
-        min: number;
-        max: number;
-    };
-    on: boolean;
-    onChangePower: () => void;
-    title: string;
-    value: number | string;
+    tresholdValue?: number;
+    canChangeTreshold: boolean;
+    canStartStop: boolean;
+    name: string;
+    currentMeasure?: number | string | undefined;
     unit?: string;
-    status: string;
-    lastUpdate: string;
-    icon: React.ReactNode;
+    status?: string;
+    lastUpdate?: string;
+    model: string;
 }
 export default function SensorCard(props: SensorCardProps) {
     const [configVisible, setConfigVisible] = useState(false);
@@ -30,43 +26,43 @@ export default function SensorCard(props: SensorCardProps) {
             <View style={{flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'}}>
                 <View style={{alignItems: 'flex-start', justifyContent:'center'}}>
                     <View style={{flexDirection:'row', justifyContent: 'center', alignItems:'center', gap: 8}}>
-                        {props.icon}
-                        <Text style={{fontSize: 14, fontWeight: 600, color: '#028f19'}}>{props.title}:  
-                            <Text style={{fontSize: 18, marginTop: 4, color: '#25572d'}}> {props.value}{props.unit || ''}</Text>
+                        <IconSelector sensorModel={props.model}/>
+                        <Text style={{fontSize: 14, fontWeight: 600, color: '#028f19'}}>{props.name}:  
+                            <Text style={{fontSize: 18, marginTop: 4, color: '#25572d'}}> {props.currentMeasure || '--'}{props.unit || ''}</Text>
                         </Text>
                     </View>
                     <View>
                         <Text>
                             <Text style={{color: '#028f19', fontSize: 14}}>Status: </Text> 
-                            {props.status}
+                            {props.status || 'Não conectado'}
                         </Text>
                         <Text>
                             <Text style={{color: '#028f19', fontSize: 14}}>Data atualização: </Text>
-                            {props.lastUpdate}
+                            {props.lastUpdate || '--'}
                         </Text>
 
-                        {props.sensibility &&
+                        {props.canChangeTreshold &&
                         <View style={{flexDirection: 'row', alignItems: 'center', gap: 2}}>
                             <Text>
-                                <Text style={{color: '#028f19', fontSize: 14}}>{props.sensibility.label}</Text>
-                                {props.sensibility.value}{props.unit}
+                                <Text style={{color: '#028f19', fontSize: 14}}>Limiar {props.name}: </Text>
+                                {props.tresholdValue || 0}{props.unit}
                             </Text>
                             <TouchableHighlight underlayColor={'#75b886'} onPress={() => setConfigVisible(true)} style={{ backgroundColor: 'transparent', alignItems: 'center'}}>
-                                <Feather name="edit" size={20} color="#1d4926" style={{padding: 2, borderRadius: 4}}/>
+                                <Feather name="edit" size={18} color="#1d4926" style={{padding: 2, borderRadius: 4}}/>
                             </TouchableHighlight>
                         </View>
                         }
                     </View>
                 </View>
-                <OnOffButton onClick={() => props.onChangePower && props.onChangePower()} on/>
+                <OnOffButton onClick={() => console.log('alterei o power')} on/>
             </View>
-            {props.sensibility &&
+            {props.canChangeTreshold &&
                 <ModalConfig
                 visible={configVisible}
-                sensorName={props.title}
+                sensorName={props.name}
                 onClose={() => setConfigVisible(false)}
-                onSave={(value) => props.sensibility?.onChangeSensibility(value)}
-                initialValue={props.sensibility.value}
+                onSave={(value) => console.log('mudouo')}
+                initialValue={props.tresholdValue || 0}
                 unit={props.unit}
                 />
             }     
@@ -77,7 +73,6 @@ export default function SensorCard(props: SensorCardProps) {
 const styles = StyleSheet.create({
     wrapper: {
         backgroundColor: '#ffffff',
-        width: '94%',
         paddingHorizontal: 24,
         paddingVertical: 16,
         borderRadius: 12,

@@ -18,6 +18,7 @@ import NavButtons from "./Steps/NavButtons";
 import { AddressDataValidation } from "../../services/Validation/AddressValidation";
 import { PasswordValidation } from "../../services/Validation/PasswordValidation";
 import registerAccount, { RegisterAccountRequestInterface } from "../../services/Account/registerAccount";
+import React from "react";
 
 interface Step {
     title: string,
@@ -238,14 +239,6 @@ export default function SignUp({navigation} : {navigation: NativeStackNavigation
             currentStepNumber={currentStep + 1}
             title={Object.values(stepsConfig)[currentStep].title}
         >
-
-            <ToastManager
-                height={'auto'}
-                textStyle={{fontSize: 16, padding: 8, textAlign: 'center'}}
-                style={{paddingRight: 32, width: 'auto', marginHorizontal: '5%'}}
-                positionValue={100}
-                duration={5000}
-            />
 
             {Object.keys(stepsConfig)[currentStep] == 'basicData' && 
             <BasicDataStep 

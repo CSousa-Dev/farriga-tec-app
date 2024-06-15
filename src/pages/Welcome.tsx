@@ -3,6 +3,7 @@ import Button from "../components/Form/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import FadeIn from "../components/Animation/FadeIn";
 import SlideHorizontal from "../components/Animation/SlideHorizontal";
+import React from "react";
 
 export default function Welcome({ navigation }: { navigation: NativeStackNavigationProp<any, 'Login'> })
 {

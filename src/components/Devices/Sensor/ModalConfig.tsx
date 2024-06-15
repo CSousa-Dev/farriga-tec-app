@@ -1,17 +1,16 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Modal, View, Text } from "react-native";
+import { Modal, View, Text, Pressable } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import Button from "./Form/Button";
+import Button from "../../Form/Button";
 import { useState } from "react";
-import SlideHorizontal from "./Animation/SlideHorizontal";
+import React from "react";
+import SlideHorizontal from "../../Animation/SlideHorizontal";
 
 interface ModalConfigProps {
     onClose: () => void;
     onSave: (value: number) => void;
-    maxValue: number;
-    minValue: number;
     initialValue: number;
-    sulfix?: string;
+    unit?: string;
     visible: boolean;
     sensorName: string;
 }
@@ -20,13 +19,13 @@ export default function ModalConfig(props: ModalConfigProps) {
     const [fill, setFill] = useState(props.initialValue);
 
     function increase() {
-        if(fill < props.maxValue) {
+        if(fill < 100) {
             setFill(fill + 1)
         }
     }
 
     function decrease() {
-        if(fill > props.minValue) {
+        if(fill > 0) {
             setFill(fill - 1)
         }
     }
@@ -47,7 +46,7 @@ export default function ModalConfig(props: ModalConfigProps) {
             }} 
             visible={props.visible}
         >
-            <View style={{
+            <Pressable style={{
                 width: '100%', 
                 backgroundColor: '#00000050', 
                 height:'100%',
@@ -58,18 +57,17 @@ export default function ModalConfig(props: ModalConfigProps) {
                     style={{
                         backgroundColor: '#ffffff',
                         width: '85%',
-                        height: '70%',
                         paddingHorizontal: 16,
                         paddingVertical: 32,
                         borderRadius: 12,
                         elevation: 24,
-                        justifyContent: 'space-between',
                         alignItems: 'center'
                     }}
                 >
-                    <View style={{alignSelf: 'flex-start', marginBottom: 40}}>
-                        <Text style={{fontSize:16}}><Text style={{color: '#186b29'}}>Sensor: </Text>{props.sensorName}</Text>
-                        <Text style={{fontSize:16}}><Text style={{color: '#186b29'}}>Valor configurado: </Text>{props.initialValue}{props.sulfix}</Text>
+                    <View style={{alignSelf: 'center', marginBottom: 24, width:'100%'}}>
+                        <Text style={{textAlign: "center", fontSize: 18, fontWeight: 500, color: '#186b29'}}>Configuração de Limiar</Text>
+                        <Text style={{fontSize:16, textAlign: "center", fontWeight: "bold", color: '#666', marginBottom: 8}}>{props.sensorName}</Text>
+                        <Text style={{textAlign: "center", color: "#666", fontSize: 16, paddingHorizontal: 16, width: '100%'}}>Altere os limites para ativação automática da irrigação</Text>
                     </View>
                     <AnimatedCircularProgress
                     size={220}
@@ -104,7 +102,7 @@ export default function ModalConfig(props: ModalConfigProps) {
                             }}
 
                         >
-                            <Text style={{color:"#ffffff", fontSize:24, fontWeight: 'bold'}}>{fill}{props.sulfix}</Text>
+                            <Text style={{color:"#ffffff", fontSize:24, fontWeight: 'bold'}}>{fill}{props.unit}</Text>
                         </LinearGradient>
                         )
                     }
@@ -113,12 +111,12 @@ export default function ModalConfig(props: ModalConfigProps) {
                         <Button text="-" type="outlined" containerStyle={{width: 60}}  onPress={decrease}/>
                         <Button text="+" containerStyle={{width: 60}} onPress={increase}/>
                     </View>
-                    <View style={{flexDirection:'row', gap: 12, marginTop: 64}}>
+                    <View style={{flexDirection:'row', gap: 12, marginTop: 18}}>
                         <Button text="Cancelar" type="outlined" containerStyle={{width: 120}} onPress={() => onClose()}/>
                         <Button text="Salvar" containerStyle={{width: 120}} onPress={() => props.onSave(fill)}/>
                     </View>
                 </SlideHorizontal>
-            </View>
+            </Pressable>
         </Modal>
     )
 }

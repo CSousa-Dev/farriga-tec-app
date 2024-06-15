@@ -7,8 +7,9 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import CheckInternetConnection from './CheckInternetConnection';
 
 export interface Credentials {
-    email: string;
+    username: string;
     password: string;
+    appKey?: string;
 }
 
 interface AuthResponse {
@@ -34,7 +35,7 @@ async function auth(credentials: Credentials, navigationRef: NativeStackNavigati
     }
 
     if(response.success)
-        await setLastLoggedEmail(credentials.email);
+        await setLastLoggedEmail(credentials.username);
     
 
     return response;
@@ -43,33 +44,54 @@ async function auth(credentials: Credentials, navigationRef: NativeStackNavigati
 
 async function authApi(credentials: Credentials, navigationRef: NativeStackNavigationProp<any, any>): Promise<AuthResponse> {
     const api = new Api();
-    const response = await api.setInterceptors(navigationRef).getInstance().post('account/login', credentials)
+    const axiosInstance = api.setInterceptors(navigationRef).getInstance();
+    try {
+        let appKey = await SecureStore.getItemAsync('appKey');
+        
+        if(appKey){ 
+            credentials.appKey = appKey;
+        }
 
-    if(response.status == 200){
-        let token = response.data.token;
-        let biometricKey = response.data.biometricKey;
-        await saveLogin(credentials.email, token, biometricKey);  
-        await saveCredentialsForOffilineLogin(credentials.email, credentials.password);
+        const response = await axiosInstance.post('account/login', {
+            username: credentials.username, password : credentials.password, appKey: credentials.appKey});
+        if (response.status === 200) {
+            let responseToken = response.data.token;
+            let responseRefreshToken = response.data.refreshToken;
+            await saveCredentialsForOfflineLogin(credentials.username, credentials.password);
+            await saveLogin(credentials.username, responseToken, responseRefreshToken);
+
+            return {
+                success: true,
+                message: 'Autenticado com sucesso.'
+            };
+        } 
 
         return {
-            success: true,
-            message: 'Autenticado com sucesso.'
+            success: false,
+            message: 'Credenciais inválidas.'
+        };
+        
+        } catch (error: any) { 
+            if(error.response && error.response.status == 401){
+                return {
+                    success: false,
+                    message: 'Credenciais inválidas.'
+                };
+            }           
+            return {
+                success: false,
+                message: 'Houve um erro inesperado, tente novamente mais tarde.'
         };
     }
-
-    return {
-        success: false,
-        message: 'Credenciais inválidas.'
-    };
 }
 
-async function authBiometricApi(email: string, biometricKey: string){
+async function authRefreshToken(email: string, refreshToken: string){
     let api = new Api();
-    let response = await api.getInstance().post('account/login/biometric', {biometricKey});
+    let response = await api.getInstance().post('account/login/biometric', {refreshToken});
     if(response.status == 200){
         let token = response.data.token;
-        let newBioKey = response.data.biometricKey;
-        await saveLogin(email, token, newBioKey);
+        let refreshToken = response.data.refreshToken;
+        await saveLogin(email, token, refreshToken);
     }
 }
 
@@ -94,14 +116,14 @@ async function biometricAuth(email: string): Promise<AuthResponse> {
         message: 'Biometria não cadastrada no dispositivo. Realize a configuração da biometria no app e no dispositivo.'
     };
 
-    const lastBiometricKey = await biometricKey(email);
+    const lastRefreshToken = await refreshToken(email);
 
     const isOnline = await CheckInternetConnection();
 
-    if(!lastBiometricKey) return {
+    if(!lastRefreshToken) return {
         tryBio: false,
         success: false,
-        message: 'Chave de biometria não encontrada. Realize o login manualmente para recria-la.'
+        message: 'Erro ao acessar o sistema pela biometria, faça login com usuário e senha novamente.'
     };
     
     const result = await LocalAuthentication.authenticateAsync({
@@ -122,8 +144,8 @@ async function biometricAuth(email: string): Promise<AuthResponse> {
         message: 'A autenticação offline não está habilidata para esse usuário, faça o login quando estiver conectado a internet.'
     }
 
-    if(result.success && isOnline)
-        await authBiometricApi(email, lastBiometricKey);
+    // if(result.success && isOnline)
+    //     await authRefreshToken(email, lastRefreshToken);
 
     return {
         tryBio: true,
@@ -135,14 +157,19 @@ async function biometricAuth(email: string): Promise<AuthResponse> {
 async function offlineAuth(
     credentials: Credentials
 ): Promise<AuthResponse>{
-    if(!(await LocalConfig.localAuthEnabled(credentials.email))) return {
+    if(!(await LocalConfig.localAuthEnabled(credentials.username))) return {
         success: false,
-        message: 'Credenciais inválidas.'
+        message: 'Autenticação offline não habilitada para ultima conta conetcada.'
     };
 
-    let emailHash = hash(credentials.email);
+    let emailHash = hash(credentials.username);
     let passwordHash = hash(credentials.password);
     let storedPassword = await SecureStore.getItemAsync('-offlineCredentials' + emailHash);
+
+    if(!storedPassword) return {
+        success: false,
+        message: 'Você não está conectado a internet e não há credenciais salvas para autenticação offline do e-mail informado.'
+    }
     if(storedPassword == passwordHash){
         return {
             success: true,
@@ -168,19 +195,27 @@ async function token(email: string){
     return await SecureStore.getItemAsync(hashEmail + '-token');
 }
 
-async function biometricKey(email: string){
-    let emailHash = hash(email);
-    return await SecureStore.getItemAsync(emailHash + '-biometricKey');
+async function currentLoggedToken(){
+    let email = await lastLoggedEmail();
+    if(!email) return '';
+    return await token(email);
+
 }
 
-async function saveLogin(email: string, token: string, biometricKey: string){
+async function refreshToken(email: string){
     let emailHash = hash(email);
+    return await SecureStore.getItemAsync(emailHash + '-refreshToken');
+}
+
+async function saveLogin(email: string, token: string, refreshToken: string){
+    let emailHash = hash(email);
+
     await SecureStore.setItemAsync(emailHash + '-email', email);
     await SecureStore.setItemAsync(emailHash + '-token', token);
-    await SecureStore.setItemAsync(emailHash + '-biometricKey', biometricKey);
+    await SecureStore.setItemAsync(emailHash + '-refreshToken', refreshToken);
 }
 
-async function saveCredentialsForOffilineLogin(
+async function saveCredentialsForOfflineLogin(
     email: string,
     password: string
 ){
@@ -200,8 +235,9 @@ function hash(value: string){
 
 const AuthService = {
     lastLoggedEmail,
+    currentLoggedToken,
     token,
-    biometricKey,
+    refreshToken,
     auth,
     eraseCredentialsForLocalLogin,
     biometricAuth

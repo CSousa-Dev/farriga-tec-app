@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { 
     View, 
     ImageBackground, 
@@ -11,17 +11,48 @@ import {
 } from "react-native";
 import Button from "../components/Form/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useFocusEffect } from '@react-navigation/native';
 import Input from "../components/Form/Input/Input";
-import login from "../services/Account/login";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AxiosResponse } from "axios";
-
+import AuthService from "../services/AuthService";
+import ToastManager, { Toast } from "toastify-react-native";
+import React from "react";
 
 export default function Login({navigation} : {navigation: NativeStackNavigationProp<any, 'Login'> }){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-  
+
+    const handleBiometricAuth = async () => {
+        try {
+            let lastLoggedEmail = await AuthService.lastLoggedEmail() ?? '';
+            setEmail(lastLoggedEmail);
+            let result = await AuthService.biometricAuth(lastLoggedEmail);
+
+            if(result.success){
+                navigation.navigate('Home');   
+            }
+
+            if(!result.success && result.tryBio){
+                Toast.error(result.message, 'bottom');
+            }
+        } catch (error) {
+            console.log(error);
+            Toast.error('Erro ao tentar fazer login.', 'bottom');
+        }
+    };
+
+    useEffect(() => {
+        handleBiometricAuth();
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            // Reset email and password when the screen is focused
+            setEmail('');
+            setPassword('');
+            handleBiometricAuth();
+        }, [])
+    );
     
     const handlePassword = (text: string) => {
         setPassword(text);
@@ -31,34 +62,45 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
         setEmail(text);
     };
 
-    const handleChange = () => {
-
-    }
-
     const handleLogin = async () => {
-        navigation.navigate('Home');
-        // setIsLoading(true);
-        // try {
-        //     const response = await login({
-        //         username: email,
-        //         password: password
-        //     }, navigation);
+        if(email == '' || password == '') {
+            Toast.error(
+                'Informe email e senha para realizar login',
+                'bottom'
+            )
 
-        //     let token = (response as AxiosResponse).data.token;
-        //     await AsyncStorage.setItem('@token', token);
-        //     setIsLoading(false);
-        //     navigation.navigate('Home');
-        // } catch (error) {
-        //     setIsLoading(false);
-        // }
+            return;
+        };
+        
+        setIsLoading(true);
+        try {
+            let authResponse = await AuthService.auth({
+                username: email,
+                password
+            }, navigation);
+
+            if(authResponse.success){
+                setIsLoading(false);
+                navigation.navigate('Home');
+            };
+
+            if(!authResponse.success){
+                Toast.error(authResponse.message, 'bottom');
+                setIsLoading(false);
+            }
+
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false);
+            Toast.error('Erro ao tentar fazer login.', 'bottom');
+        }
     };
-
 
     return (
         <KeyboardAvoidingView
             style={{flex: 1}}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'} // Change null to 'padding'
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // ajuste o valor conforme necessário
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
         >
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
@@ -72,6 +114,13 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                     source={require('../../assets/farm.jpg')} 
                 >
                     <View style={baseStyles.container}>
+                    <ToastManager
+                        height={'auto'}
+                        textStyle={{fontSize: 16, padding: 8, textAlign: 'center'}}
+                        style={{paddingRight: 32, width: '90%'}}
+                        positionValue={300}
+                        duration={5000}
+                    />
                         <Image 
                             style={{
                                 alignSelf: 'center',
@@ -118,7 +167,6 @@ export default function Login({navigation} : {navigation: NativeStackNavigationP
                         />
                         <Text style={{textAlign: 'center', fontSize: 16}}>Ainda não possui uma conta? <Text style={formStyles.ancor} onPress={() => navigation.navigate('SignUp')}>Cadastre-se</Text></Text>
                     </View>
-                    
                 </ImageBackground>
             </ScrollView>
         </KeyboardAvoidingView>

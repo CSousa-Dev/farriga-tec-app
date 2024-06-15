@@ -2,10 +2,13 @@ import { TextStyle } from "react-native";
 
 export default interface BaseInputProps {
     containerStyle?: TextStyle;
-    label: string;
-    type?: 'text' | 'date' | 'password';
+    labelStyle?: TextStyle;
+    label?: string;
+    type?: 'text' | 'date' | 'password' | 'checkbox';
     placeholder: string;
     onChange?: (text: string) => void;
+    onPress?: () => void;
+    checked?: boolean;
     value?: string;
     keyboardType?: 'numeric' | 'default';
     validationErrors?: string[];

@@ -1,4 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
 import { ReactElement } from "react";
 import { Text, StyleSheet, TouchableOpacity, ActivityIndicator} from "react-native";
 

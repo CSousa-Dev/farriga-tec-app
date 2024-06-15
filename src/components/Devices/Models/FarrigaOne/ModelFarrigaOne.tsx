@@ -6,6 +6,7 @@ import FarrigaOneMiniSensorsWrapper from "./FarrigaOneMiniSensorsWrapper";
 import { useState } from "react";
 import FarrigaOneSensorsWrapper from "./FarrigaOneSensorsWrapper";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import React from "react";
 
 interface ModelFarrigaOneProps {
     isConnect: boolean;
@@ -40,7 +41,7 @@ interface ModelFarrigaOneProps {
     } 
 }
 
-export default function ModelFarrigaOne(props: ModelFarrigaOneProps) {
+export default function ModelFarrigaOne() {
 
     const [colapse, setColapse] = useState(false);
     const rotation = useSharedValue(0);

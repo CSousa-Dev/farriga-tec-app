@@ -1,8 +1,8 @@
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
 import { Text,  View, TouchableOpacity } from 'react-native'
 import { BaseInputStyle } from './BaseInputStyle';
 import BaseInputProps from './BaseInputProps';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 export default function DateInput(props: BaseInputProps) {
     const [isFocused, setIsFocused] = useState(false);

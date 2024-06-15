@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import Button from "../components/Form/Button";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React from "react";
 
 export default function Initial({navigation} : {navigation: NativeStackNavigationProp<any, 'Initial'> }){
     return (
