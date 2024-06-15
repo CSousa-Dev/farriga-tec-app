@@ -9,6 +9,7 @@ import {
     StyleSheet
 } from "react-native";
 import { ReactNode } from "react";
+import React from "react";
 
 interface StepTemplatePropsInterface {
     currentStepNumber: number;
@@ -28,6 +29,7 @@ export default function StepTemplate(props: StepTemplatePropsInterface)
     >
         <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}
+            scrollEnabled={false}
             keyboardShouldPersistTaps="handled"
         >
             <ImageBackground 
