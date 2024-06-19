@@ -1,4 +1,5 @@
 import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import Navigation from "./src/routes/Navigation";
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect } from "react";
@@ -21,6 +22,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={{flex: 1}}>
+        <StatusBar/>
         <Navigation/>
     </SafeAreaView>
   );

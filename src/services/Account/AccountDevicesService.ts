@@ -9,6 +9,7 @@ export interface DeviceData {
     alias: string;
     model: string;
     status?: string;
+    bluetoothOn?: boolean;
     actions: DeviceActions;
     configuredEvents: Event[]
     zones: Zone[];

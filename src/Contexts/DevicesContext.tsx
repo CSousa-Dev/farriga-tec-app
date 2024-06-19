@@ -1,14 +1,18 @@
-import React, { createContext, ReactNode, useState } from 'react';
+import React, { createContext, ReactNode, useMemo, useState } from 'react';
 import AccountDevicesService, { DeviceData } from '../services/Account/AccountDevicesService';
-import { all } from 'axios';
+import useBLE from '../Hooks/useBle';
+import BluetoothLowEnergyApiInterface from '../Hooks/BluetoothLowEnergyApiInterface';
 
 export const DevicesContext = createContext({
     devices: {} as {[macAddress: string]: DeviceData},
     fetchDevices: async () => {},
     isSearching: false,
+    bluetoothApi: {} as BluetoothLowEnergyApiInterface,
+    setBluetoothStatus: (macAddress: string, status: boolean) => {}
 });
 
 export const DevicesProvider = ({children} : { children: ReactNode}) => {
+    const bluetoothApi = useBLE();
     const [devices, setDevices] = useState<{[macAddress: string]: DeviceData}>({});
     const [isSearching, setIsSearching] = useState(false);
 
@@ -29,12 +33,22 @@ export const DevicesProvider = ({children} : { children: ReactNode}) => {
         setIsSearching(false);
     }
 
+    const setBluetoothStatus = (macAddress: string, status: boolean) => {
+        let device = devices[macAddress];
+        if(device){
+            device.bluetoothOn = status;
+            setDevices({...devices, [macAddress]: device});
+        }
+    }
+
     return (
         <DevicesContext.Provider value={
             {
                 devices,
                 fetchDevices,
-                isSearching
+                isSearching,
+                bluetoothApi,
+                setBluetoothStatus
             }
         }>
             {children}

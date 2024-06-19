@@ -81,14 +81,14 @@ export default function Home({ navigation }: { navigation: NativeStackNavigation
         {
         searchingDelay || isSearching ? <SearchingDevices/> :
         Object.values(devices).length == 0 ? <NoDevicesFound/> :
-        <>
+        <View style={{flex: 1}}>
             <DevicesList devices={Object.values(devices)}/>
             <Button
                 text='Vincular Novo Dispositivo'
                 onPress={() => setModalNewDevice(true)}
-                containerStyle={{width: '85%', alignSelf: 'center', marginVertical: 36}}
+                containerStyle={{width: '85%', alignSelf: 'center', marginVertical: 16}}
             />
-        </>
+        </View>
         }
         <ModalNewDevice visible={modalNewDevice} onClose={() => setModalNewDevice(false)}/>
         <ModalCanUseBio visible={modalCanUseBio} onClose={closeModalCanUseBio} />

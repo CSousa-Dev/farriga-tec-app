@@ -19,16 +19,16 @@ interface DeviceProps {
 
 export default function Device({deviceData}: DeviceProps) {
     const [colapse, setColapse] = useState(false);
-    const [selectedZone, setSelectedZone] = useState(1);
+    const [selectedZone, setSelectedZone] = useState(0);
     const [editingZoneAlias, setEditingZoneAlias] = useState<number | boolean>();
-    const [blueTooth, setBlueTooth] = useState(false);
     const [power, setPower] = useState(false);
 
-    const handleBluetooth = () => {
-        setBlueTooth(!blueTooth);
-    }
-
     const handleChangeSelectedZone = (zone: number) => {
+        if(selectedZone == zone){
+            setSelectedZone(0);
+            return;
+        }
+        
         setSelectedZone(zone);
         setEditingZoneAlias(false);
     }
@@ -53,9 +53,8 @@ export default function Device({deviceData}: DeviceProps) {
                 canControllPower={deviceData.actions.canPowerControll}
                 canUseBluetooth={deviceData.actions.useBluetooth}
                 status={deviceData.status}
-                onBluetoothClick={handleBluetooth}
                 onPowerClick={handlePower}
-                bluetoothOn={blueTooth}
+                bluetoothOn={deviceData.bluetoothOn}
                 powerOn={power}
             />
             <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Zonas: </Text>
@@ -77,10 +76,17 @@ export default function Device({deviceData}: DeviceProps) {
                 )}
                 keyExtractor={item => item.position.toString()}
             />
-            <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Sensores: </Text>
-            {(deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors).length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhum sensor configurado para zona selecionada</Text> }
+
+            {selectedZone !== 0 && 
+                <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Sensores: </Text>
+            }
+
+            {selectedZone !== 0 &&
+                (deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors).length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhum sensor configurado para zona selecionada</Text> 
+            }
+
             
-            {!colapse &&
+            {!colapse && selectedZone !== 0 &&
                 <FlatList
                     data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors}
                     style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center'}}
@@ -92,7 +98,8 @@ export default function Device({deviceData}: DeviceProps) {
                     }
                 />
             }
-            {colapse && 
+
+            {colapse && selectedZone !== 0 &&
                 <FlatList
                 data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors}
                 style={{flex: 1, width: '80%'}}
@@ -115,10 +122,15 @@ export default function Device({deviceData}: DeviceProps) {
             />
             }
 
-            <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Irrigadores: </Text>
-            {(deviceData.zones.filter(zone => zone.position == selectedZone)[0].irrigators).length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhum irrigador configurado para zona selecionada</Text> }
+            {selectedZone !== 0 && 
+                <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Irrigadores: </Text>
+            }
+
+            {selectedZone !== 0 && 
+                (deviceData.zones.filter(zone => zone.position == selectedZone)[0].irrigators).length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhum irrigador configurado para zona selecionada</Text> 
+            }
             
-            {!colapse &&
+            {!colapse && selectedZone !== 0 &&
                 <FlatList
                     data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].irrigators}
                     style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center'}}
@@ -131,20 +143,27 @@ export default function Device({deviceData}: DeviceProps) {
                 />
             }
 
-            {colapse && 
+            {colapse && selectedZone !== 0 &&
                 <FlatList
                 data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].irrigators}
                 style={{flex: 1, width: '80%'}}
                 renderItem={({ item }
                 ) => (
                     <SlideHorizontal delayDuration={item.position * 100}>
-                        <IrrigatorCard alias={item.alias} currentActivity={'Irrigando'} position={item.position}/>
+                        <IrrigatorCard alias={item.alias} currentActivity={'Irrigando'} position={item.position} canStartStop name="Irrigador 1" model="a"/>
                     </SlideHorizontal>
                 )}
                     keyExtractor={item => item.position.toString()
                 }
             />}
-            <CollapseButton onPress={() => setColapse(!colapse)} colapse={colapse}/>
+
+            {selectedZone !== 0 &&
+                <CollapseButton onPress={() => setColapse(!colapse)} colapse={colapse}/>
+            }
+
+            {selectedZone == 0 && deviceData.zones.length !== 0 &&
+                <Text style={{color: '#ffffff', alignSelf: 'flex-start', textAlign: "center", fontSize:14, marginHorizontal: 'auto', marginBottom: 16, width: '80%'}}>Clique em uma das zonas para visualizar os sensores e irrigadores</Text>
+            }
         </LinearGradient>
     );
 }
