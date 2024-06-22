@@ -5,7 +5,6 @@ import BluetoothLowEnergyApiInterface from "./BluetoothLowEnergyApiInterface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Buffer } from 'buffer';
 
-
 function useBLE(): BluetoothLowEnergyApiInterface {
     const bleManager = useMemo(() => new BleManager(), []);
     const [allDevices, setAllDevices] = useState<Device[]>([]);
@@ -30,7 +29,7 @@ function useBLE(): BluetoothLowEnergyApiInterface {
             }
             syncConnectedDevices();
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }     
     }
 

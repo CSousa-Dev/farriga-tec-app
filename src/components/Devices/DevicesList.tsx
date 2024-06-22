@@ -12,8 +12,8 @@ export default function DevicesList({devices}: DevicesListProps){
 
     function header () {
         return (
-            <View style={{paddingLeft: 24, marginTop: 16, marginBottom: 8}}>
-                <Text style={{fontSize: 20, fontWeight: '500', color: '#666', textAlign: 'left'}}>Meus dispositivos:</Text>
+            <View style={{paddingLeft: 24, marginTop: 16, marginBottom: 16}}>
+                <Text style={{fontSize: 18, fontWeight: '500', color: '#666', textAlign: 'left'}}>Meus dispositivos:</Text>
             </View>
         )
     }

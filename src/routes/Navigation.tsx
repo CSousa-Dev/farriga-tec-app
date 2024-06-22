@@ -9,6 +9,7 @@ import ToastManager from "toastify-react-native";
 import React from "react";
 import SuccessfullyLinkedNewDevice from "../pages/SuccessfullyLinkedNewDevice";
 import HomeWrapper from "../pages/Home/HomeWrapper";
+import DeviceBleKeys from "../pages/DeviceBleKeys";
 
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,10 @@ export default function Navigation(){
                 <Stack.Screen 
                     name="Login" 
                     component={Login}
+                />
+                <Stack.Screen 
+                    name="DeviceBleKeys" 
+                    component={DeviceBleKeys}
                 />
                 <Stack.Screen 
                     name="Initial" 

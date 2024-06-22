@@ -2,9 +2,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Modal, View, Text, Pressable } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import Button from "../../Form/Button";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import React from "react";
 import SlideHorizontal from "../../Animation/SlideHorizontal";
+import { DevicesContext } from "../../../Contexts/DevicesContext";
+import ToastManager, { Toast } from "toastify-react-native";
 
 interface ModalConfigProps {
     onClose: () => void;
@@ -13,10 +15,12 @@ interface ModalConfigProps {
     unit?: string;
     visible: boolean;
     sensorName: string;
+    macAddress: string;
 }
 
 export default function ModalConfig(props: ModalConfigProps) {
     const [fill, setFill] = useState(props.initialValue);
+    const deviceContext = useContext(DevicesContext);
 
     function increase() {
         if(fill < 100) {
@@ -33,6 +37,19 @@ export default function ModalConfig(props: ModalConfigProps) {
     function onClose(){
         setFill(props.initialValue)
         props.onClose()
+    }
+
+    const tresholdChange = async (value: number) => {
+        try{
+            deviceContext.sendMessage(props.macAddress, 'changeTreshold', {
+                macAddress: props.macAddress,
+                sensorId: props.sensorName,
+                threshold: value
+            });
+            Toast.success('Novo limiar enviado com sucesso', 'bottom');
+        } catch {
+            Toast.error('Erro ao enviar mensagem para o dispositivo, verifique se o dispositivo está conectado a internet ou ao bluetooth', 'bottom');
+        }
     }
 
     return (
@@ -64,6 +81,13 @@ export default function ModalConfig(props: ModalConfigProps) {
                         alignItems: 'center'
                     }}
                 >
+                <ToastManager
+                    height={'auto'}
+                    textStyle={{fontSize: 16, padding: 8, textAlign: 'center'}}
+                    style={{paddingRight: 32, width: '90%'}}
+                    positionValue={200}
+                    duration={5000}
+                />  
                     <View style={{alignSelf: 'center', marginBottom: 24, width:'100%'}}>
                         <Text style={{textAlign: "center", fontSize: 18, fontWeight: 500, color: '#186b29'}}>Configuração de Limiar</Text>
                         <Text style={{fontSize:16, textAlign: "center", fontWeight: "bold", color: '#666', marginBottom: 8}}>{props.sensorName}</Text>
@@ -86,7 +110,6 @@ export default function ModalConfig(props: ModalConfigProps) {
                     }}
                     tintColor="#00a11b"
                     backgroundColor="#399c4b44"
-                    onAnimationComplete={() => console.log('onAnimationComplete')}
                     >
                     {
                         () => (
@@ -112,8 +135,8 @@ export default function ModalConfig(props: ModalConfigProps) {
                         <Button text="+" containerStyle={{width: 60}} onPress={increase}/>
                     </View>
                     <View style={{flexDirection:'row', gap: 12, marginTop: 18}}>
-                        <Button text="Cancelar" type="outlined" containerStyle={{width: 120}} onPress={() => onClose()}/>
-                        <Button text="Salvar" containerStyle={{width: 120}} onPress={() => props.onSave(fill)}/>
+                        <Button text="Fechar" type="outlined" containerStyle={{width: 120}} onPress={() => onClose()}/>
+                        <Button text="Salvar" containerStyle={{width: 120}} onPress={async () => await tresholdChange(fill)}/>
                     </View>
                 </SlideHorizontal>
             </Pressable>

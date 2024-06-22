@@ -40,7 +40,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
         return (
             <>
             <Text
-                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16}}
+                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16, width: '100%'}}
             >Enquanto o dispositivo estiver conectado via bluetooth outras conexões via Wifi serão abortadas</Text>  
             <Button
                 text='Iniciar conexão'
@@ -56,7 +56,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
         return (
             <>
             <Text
-                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16}}
+                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16, width: '100%'}}
             ><Text>Buscando</Text> dispositivo de MacAddress: {props.deviceMacAddress}</Text>  
             <ActivityIndicator size="large" color="#0f9e20" style={{marginBottom: 32}}/>
             </>
@@ -67,7 +67,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
         return (
             <>
             <Text
-                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16}}
+                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16, width: '100%'}}
             >Dispositivo encontrado, inciando conexão...</Text>  
             <ActivityIndicator size="large" color="#0f9e20" style={{marginBottom: 32}}/>
             </>
@@ -78,7 +78,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
         return (
             <>
             <Text
-                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16}}
+                style={{fontSize: 16, color: '#666', textAlign: 'center', marginVertical: 16, paddingHorizontal: 16, width:'100%'}}
             >Conectando ao dispositivo...</Text>  
             <ActivityIndicator size="large" color="#0f9e20" style={{marginBottom: 32}}/>
             </>
@@ -88,7 +88,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
     const connectedComponent = () => {
         return (
             <FadeIn>
-                <Text style={{textAlign: 'center', fontSize: 18, color: '#25572d', marginVertical: 16}}>Dispositivio conectado com sucesso!</Text>
+                <Text style={{textAlign: 'center', fontSize: 18, color: '#25572d', marginVertical: 16, width: '100%'}}>Dispositivio conectado com sucesso!</Text>
                 <Ionicons name="checkmark-done" size={60} color="#25572d" style={{marginHorizontal: 'auto', marginBottom: 16}} />
             </FadeIn>
         )
@@ -192,7 +192,7 @@ export default function BluetoothConnectModal(props: BluetoothModalProps) {
                         alignItems: 'center'
                     }}
                 >
-                    <Text style={{fontSize: 18, color: '#235818', textAlign: 'center', marginBottom: 16}}>Conexão via Bluetooth</Text>
+                    <Text style={{fontSize: 18, width: '100%', color: '#235818', textAlign: 'center', marginBottom: 16}}>Conexão via Bluetooth</Text>
                     <Feather name="bluetooth" size={36} color="#141f80"/>
                     
                     {connectionStatus === 'not-initialized' && notInitializedComponent()}

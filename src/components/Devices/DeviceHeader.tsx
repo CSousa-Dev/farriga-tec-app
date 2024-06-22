@@ -6,6 +6,8 @@ import useBLE from "../../Hooks/useBle";
 import BluetoothConnectModal from "./BluetoothConnectModal";
 import { DevicesContext } from "../../Contexts/DevicesContext";
 import BluetoothDisconnectModal from "./BluetoothDisconnectModal";
+import { useEventEmitter } from "../../Hooks/useEventEmitter";
+import { useNavigation } from "@react-navigation/native";
 
 interface DeviceHeaderProps {
     macAddress: string;
@@ -14,6 +16,7 @@ interface DeviceHeaderProps {
     status?: string;
     canControllPower: boolean;
     canUseBluetooth: boolean;
+    lastReceivedEvent?: Date;
     onPowerClick: () => void;
     bluetoothOn?: boolean;
     powerOn: boolean;
@@ -24,7 +27,10 @@ export default function DeviceHeader(props: DeviceHeaderProps){
     const [bluetoothDisconnectModalVisible, setBluetoothDisconnectModalVisible] = React.useState<boolean>(false);
     const [bluetoothConnected, setBluetoothConnected] = React.useState<boolean>(false);
     const devicesContext = useContext(DevicesContext);
+    const { useEventListener, emitEvent } = useEventEmitter();
     const ble = devicesContext.bluetoothApi;
+    const navigation = useNavigation()
+
 
     useEffect(() => {
         checkDeviceIsBluetoothConnected();
@@ -60,21 +66,35 @@ export default function DeviceHeader(props: DeviceHeaderProps){
     }
 
     const onPowerClick = async () => {
-        ble.sendCommandToDevice('FarrigaTec', 'CONFIG_MODE_OFF');
+        emitEvent("powerOffDevice", {
+            macAddress: props.macAddress
+        });
+    }
+
+    const isReceivedEventInLastMinute = () => {
+        if(!props.lastReceivedEvent){
+            return false;
+        }
+
+        const now = new Date();
+        const diff = now.getTime() - props.lastReceivedEvent.getTime();
+        return diff < 60000;
     }
 
     return (
         <View style={styles.wrapper}> 
-            <View style={{justifyContent: 'flex-start', alignItems: 'flex-start'}}>
-                <Text style={{color: '#ffffff', fontSize: 12}}>MacAddress: {props.macAddress}</Text>
-                <Text style={{color: '#ffffff'}}>Disposivo:</Text>
+            <View style={{justifyContent: 'flex-start', alignItems: 'flex-start', width: '60%'}}>
+                <Text style={{color: '#ffffff', fontSize: 10 , width:'100%'}}>MacAddress: {props.macAddress}</Text>
+                <Text style={{color: '#ffffff', width:'100%'}}>Disposivo:</Text>
                 <Text style={{fontSize:18, fontWeight: 'bold', color: '#ffffff'}}>{props.deviceAlias || props.deviceModel}</Text>
-                <Text style={{color: '#ffffff'}}>Status: {props.status || 'Não conectado'}</Text>
+                <Text style={{color: '#ffffff'}}>Status: {isReceivedEventInLastMinute() ?  'Conectado' : bluetoothConnected ? 'Conectado via Bluetooth': 'Não conectado'}</Text>
             </View>
-            <View style={{flexDirection: 'row', gap: 6}}>
+            <View style={{flexDirection: 'row', gap: 6, flexWrap: 'wrap', width: '50%', }}>
                 {props.canUseBluetooth && <BluetoothButton onClick={() => onBluetoothClick()} on={bluetoothConnected}/>}
-                {props.canControllPower && <OnOffButton onClick={() => onPowerClick()} on={props.powerOn}/>}
+                {props.canControllPower && <OnOffButton onClick={() => onPowerClick()} on={true} onText="Reiniciar dispositivo" offText="Ativar Dispositivo" height={70} width={70} fontSize={9}/>}
             </View>
+
+            
             <BluetoothConnectModal visible={bluetoothModalVisible} onClose={() => setBluetoothModalVisible(false)} onSuccessfulConnection={() => handleSuccessConnection()} deviceMacAddress={props.macAddress}/>
             <BluetoothDisconnectModal visible={bluetoothDisconnectModalVisible} onClose={() => setBluetoothDisconnectModalVisible(false)} deviceMacAddress={props.macAddress} onSuccessfulDisconnect={() => console.log('disconneted')}/>
         </View>

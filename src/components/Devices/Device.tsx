@@ -56,6 +56,7 @@ export default function Device({deviceData}: DeviceProps) {
                 onPowerClick={handlePower}
                 bluetoothOn={deviceData.bluetoothOn}
                 powerOn={power}
+                lastReceivedEvent={deviceData.lastReceivedEvent}
             />
             <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:18, marginBottom: 8}}>Zonas: </Text>
             {deviceData.zones.length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhuma zona configurada para este dispositivo</Text>}
@@ -84,15 +85,14 @@ export default function Device({deviceData}: DeviceProps) {
             {selectedZone !== 0 &&
                 (deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors).length == 0 && <Text style={{color: '#ffffff', alignSelf: 'flex-start', paddingLeft: 32, fontSize:14, marginBottom: 8}}>Nenhum sensor configurado para zona selecionada</Text> 
             }
-
             
             {!colapse && selectedZone !== 0 &&
                 <FlatList
                     data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].sensors}
-                    style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center'}}
+                    style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-start'}}
                     renderItem={({ item }
                     ) => (
-                        <SensorMiniCard sensorModel={item.model} sensorName={item.name} currentMeasure={undefined}/>
+                        <SensorMiniCard sensorModel={item.model} sensorName={item.name} currentMeasure={item.lastMeasure ? item.lastMeasure.value : undefined} measureUnit={item.unit}/>
                     )}
                         keyExtractor={item => item.position.toString()
                     }
@@ -107,6 +107,8 @@ export default function Device({deviceData}: DeviceProps) {
                 ) => (
                     <SlideHorizontal delayDuration={item.position * 100}>
                         <SensorCard
+                            macAddress={deviceData.macAddress}
+                            id='1'
                             name={item.name}
                             model={item.model}
                             canStartStop={item.actions.canChangeStartStop}
@@ -133,10 +135,10 @@ export default function Device({deviceData}: DeviceProps) {
             {!colapse && selectedZone !== 0 &&
                 <FlatList
                     data={deviceData.zones.filter(zone => zone.position == selectedZone)[0].irrigators}
-                    style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center'}}
+                    style={{flex: 1, width: '80%', flexDirection: 'row', gap: 5, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-start'}}
                     renderItem={({ item }
                     ) => (
-                        <IrrigatorMiniCard alias={item.alias} currentActivity={'Irrigando'} position={item.position}/>
+                        <IrrigatorMiniCard alias={item.alias} currentActivity={item.irrigating ? 'irrigando' : 'em espera'} position={item.position}/>
                     )}
                         keyExtractor={item => item.position.toString()
                     }
@@ -150,7 +152,12 @@ export default function Device({deviceData}: DeviceProps) {
                 renderItem={({ item }
                 ) => (
                     <SlideHorizontal delayDuration={item.position * 100}>
-                        <IrrigatorCard alias={item.alias} currentActivity={'Irrigando'} position={item.position} canStartStop name="Irrigador 1" model="a"/>
+                        <IrrigatorCard 
+                            lastUpdate={item.updatedAt}
+                            irrigationStartedAt={item.irrigationStartedAt}
+                            irrigationStopedAt={item.irrigationStopedAt}
+                            irrigating={item.irrigating}
+                            macAddress={deviceData.macAddress} id={'1'} alias={item.alias} position={item.position} canStartStop name="Irrigador 1" model="a"/>
                     </SlideHorizontal>
                 )}
                     keyExtractor={item => item.position.toString()

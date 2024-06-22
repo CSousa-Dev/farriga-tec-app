@@ -13,6 +13,7 @@ export interface DeviceData {
     actions: DeviceActions;
     configuredEvents: Event[]
     zones: Zone[];
+    lastReceivedEvent?: Date;
 }
 
 interface DeviceActions {
@@ -45,6 +46,12 @@ interface Sensor {
     unit?: string;
     actions: SensorActions;
     configuredEvents: Event[];
+    lastMeasure?: Measure;
+}
+
+interface Measure {
+    value: number | boolean;
+    measuredAt: Date;
 }
 
 interface SensorActions {
@@ -59,6 +66,10 @@ interface Irrigator {
     model: string;
     actions: IrrigatorActions;
     configuredEvents: Event[];
+    irrigating: boolean;
+    irrigationStartedAt?: Date;
+    irrigationStopedAt?: Date;
+    updatedAt?: Date;
 }
 
 interface IrrigatorActions {

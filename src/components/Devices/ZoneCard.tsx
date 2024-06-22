@@ -24,16 +24,18 @@ export default function ZoneCard({position, alias, selected, onPress, onSave, on
 
     return (
         <Pressable style={{backgroundColor: "#ffff", padding: 8, borderRadius: 6, borderWidth: selected ? 4 : 2, borderColor: selected ? '#03e703' : '#666'}} onPress={onPress}>
-            {!editing && <Text style={{width: '100%', textAlign: "center", color: selected ? '#058105' : '#666'}}>{alias ?? 'Zona' + position} {selected && <Feather name="edit" size={16} color="#1d4926" onPress={() => handleEdit()} />}
+            
+            {!editing && <Text style={{width: '100%', textAlign: "center", color: selected ? '#058105' : '#666'}}>{'Zona ' + position} 
+                {selected && false && <Feather name="edit" size={16} color="#1d4926" onPress={() => handleEdit()} />}
             </Text>}
 
-            {selected && editing && <View style={{flexDirection: "row", alignContent: 'center', justifyContent: 'center', gap: 3}}><TextInput
+            {/* {selected && editing && <View style={{flexDirection: "row", alignContent: 'center', justifyContent: 'center', gap: 3}}><TextInput
                 autoFocus
                 value={newAlias}
                 onChangeText={setNewAlias}
                 style={{color: '#666'}}
             /><Text> {newAlias.length > 0 && <Ionicons onPress={() => onSave(position, newAlias)} name="checkmark-done-outline" size={22} style={{marginHorizontal: 6}} color="#058105" />} <MaterialIcons name="cancel" size={22} color="#ac0000" onPress={() => onCancelEdit()} /></Text></View>}
-            
+             */}
         </Pressable>
     )
 }
